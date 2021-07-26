@@ -37,6 +37,7 @@ public class CustomURLFilter implements Filter {
             StringBuilder data = new StringBuilder();
             data.append("\nLOGGING REQUEST-----------------------------------\n")
                     .append("[REQUEST-ID]: ").append(requestId).append("\n")
+                    .append("[USERNAME]: ").append(request.getRemoteUser()).append("\n")
                     .append("[PATH]: ").append(request.getRequestURI()).append("\n")
                     .append("[QUERIES]: ").append(request.getQueryString()).append("\n")
                     .append("[HEADERS]: ").append("\n");

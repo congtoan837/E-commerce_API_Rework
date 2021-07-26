@@ -10,26 +10,22 @@ import java.util.Optional;
 
 public interface UserService {
 
+
     Page<User> findAll(Pageable pageable);
 
-    @Query("SELECT u FROM User u WHERE u.username = :username")
-    User getByUser(String username);
+    User getByUsername(String username);
 
     User save(User entity);
 
     List<User> saveAll(List<User> entities);
 
-    Optional<User> findById(Integer integer);
+    Optional<User> findById(Long aLong);
 
-    boolean existsById(Integer integer);
+    void deleteById(Long aLong);
 
     Iterable<User> findAll();
 
-    Iterable<User> findAllById(Iterable<Integer> integers);
-
     long count();
-
-    void deleteById(Integer integer);
 
     void delete(User entity);
 

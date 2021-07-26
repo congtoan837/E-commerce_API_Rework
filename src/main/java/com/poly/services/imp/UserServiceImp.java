@@ -23,9 +23,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    @Query("SELECT u FROM User u WHERE u.username = :username")
-    public User getByUser(String username) {
-        return userRepository.getByUser(username);
+    public User getByUsername(String username) {
+        return userRepository.getByUsername(username);
     }
 
     @Override
@@ -39,13 +38,13 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public Optional<User> findById(Integer integer) {
-        return userRepository.findById(integer);
+    public Optional<User> findById(Long aLong) {
+        return userRepository.findById(aLong);
     }
 
     @Override
-    public boolean existsById(Integer integer) {
-        return userRepository.existsById(integer);
+    public void deleteById(Long aLong) {
+        userRepository.deleteById(aLong);
     }
 
     @Override
@@ -54,19 +53,10 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public Iterable<User> findAllById(Iterable<Integer> integers) {
-        return userRepository.findAllById(integers);
-    }
-
-    @Override
     public long count() {
         return userRepository.count();
     }
 
-    @Override
-    public void deleteById(Integer integer) {
-        userRepository.deleteById(integer);
-    }
 
     @Override
     public void delete(User entity) {

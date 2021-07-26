@@ -1,5 +1,6 @@
 package com.poly.services;
 
+import com.poly.entity.Role;
 import com.poly.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -7,25 +8,37 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AuthService implements UserDetails {
 	
 	private User users;
-	
-	public AuthService(User user) {
+
+	private Collection<? extends GrantedAuthority> roles;
+
+	public AuthService(User user, Collection<? extends GrantedAuthority> roles) {
 		super();
 		this.users = user;
+		this.roles = roles;
+	}
+
+	public static AuthService build(User user) {
+		List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
+				new SimpleGrantedAuthority(role.getName())
+		).collect(Collectors.toList());
+
+		return new AuthService(user, authorities);
+	}
+
+	public Long getId() {
+		return users.getId();
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		ArrayList<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
-		list.add(new SimpleGrantedAuthority(users.getRole()));
-		return list;
-	}
-
-	public Integer getId() {
-		return users.getId();
+		return roles;
 	}
 
 	@Override

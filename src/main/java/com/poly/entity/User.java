@@ -1,10 +1,15 @@
 package com.poly.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -12,7 +17,7 @@ import java.util.Date;
 public class User implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 	@Column(name = "Name")
     private String name;
 	@Column(name = "Email")
@@ -26,12 +31,23 @@ public class User implements Serializable{
 	@Column(name = "Image")
     private String image;
 	@Column(name = "Status")
-	private String status;
+	private boolean status;
 	@Column(name = "Username")
 	private String username;
-	@Column(name = "Role")
-	private String role;
-	@Column(name = "CreateTime")
-	@Temporal(TemporalType.DATE)
-	private Date createTime;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "users_roles",
+			joinColumns = {@JoinColumn(name = "user_id")},
+			inverseJoinColumns = {@JoinColumn(name = "role_id")})
+	private Set<Role> roles;
+
+	@CreationTimestamp
+	@Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+//	@Temporal(TemporalType.TIMESTAMP)
+	private LocalDateTime createTime;
+
+	@UpdateTimestamp
+	@Column(name = "ModifiedLastTime")
+//	@Temporal(TemporalType.TIMESTAMP)
+	private LocalDateTime modifiedLastTime;
 }

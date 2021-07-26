@@ -18,15 +18,20 @@ public class LoggingService {
         }
         Object requestId = httpServletRequest.getAttribute(REQUEST_ID);
         StringBuilder data = new StringBuilder();
-        data.append("\nLOGGING REQUEST BODY-----------------------------------\n")
+        try {
+            data.append("\nLOGGING REQUEST BODY-----------------------------------\n")
                 .append("[REQUEST-ID]: ").append(requestId).append("\n")
                 .append("[IPClient]: ").append(IPClient.getClientIp(httpServletRequest)).append("\n")
                 .append("[SESSION]: ").append(httpServletRequest.getSession().getId()).append("\n")
                 .append("[BODY REQUEST]: ").append("\n\n")
-                .append(GsonParserUtils.parseObjectToString(body))
+//                .append(GsonParserUtils.parseObjectToString(body))
                 .append("\n\n")
                 .append("LOGGING REQUEST BODY-----------------------------------\n");
-        log.info(data.toString());
+            log.info(data.toString());
+        } catch (Exception e) {
+
+        }
+
     }
 
     public void logResponse(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object body) {
@@ -35,12 +40,14 @@ public class LoggingService {
         }
         Object requestId = httpServletRequest.getAttribute(REQUEST_ID);
         StringBuilder data = new StringBuilder();
-        data.append("\nLOGGING RESPONSE-----------------------------------\n")
+        try {
+            data.append("\nLOGGING RESPONSE-----------------------------------\n")
                 .append("[REQUEST-ID]: ").append(requestId).append("\n")
-                .append("[BODY RESPONSE]: ").append("\n\n")
-                .append(GsonParserUtils.parseObjectToString(body))
-                .append("\n\n")
+                .append("[RESPONSE-CODE]: ").append(httpServletResponse.getStatus()).append("\n")
                 .append("LOGGING RESPONSE-----------------------------------\n");
-        log.info(data.toString());
+            log.info(data.toString());
+        }catch (Exception e) {
+
+        }
     }
 }

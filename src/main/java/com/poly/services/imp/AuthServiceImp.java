@@ -17,11 +17,11 @@ public class AuthServiceImp implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.getByUser(username);
+		User user = userRepository.getByUsername(username);
 		
 		if(user == null) {
-			throw new UsernameNotFoundException("Could not find User");
+			throw new UsernameNotFoundException("Could not find User: " + username);
 		}
-		return new AuthService(user);
+		return AuthService.build(user);
 	}
 }

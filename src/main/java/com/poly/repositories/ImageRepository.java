@@ -1,10 +1,12 @@
 package com.poly.repositories;
 
-import com.poly.entity.User;
+import com.poly.entity.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-	User getByUsername(String username);
+public interface ImageRepository extends JpaRepository<Image, Long> {
+
 }

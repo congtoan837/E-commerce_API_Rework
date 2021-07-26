@@ -1,15 +1,17 @@
 package com.poly.controller;
 
-import com.poly.ex.JwtUtils;
 import com.poly.entity.JwtResponse;
 import com.poly.entity.LoginRequest;
+import com.poly.entity.Role;
 import com.poly.entity.User;
-import com.poly.services.ResponseUtils;
+import com.poly.ex.JwtUtils;
 import com.poly.services.AuthService;
+import com.poly.services.ResponseUtils;
 import com.poly.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,9 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
@@ -53,7 +54,7 @@ public class AuthController {
             AuthService userDetails = (AuthService) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                     .collect(Collectors.toList());
-                return getResponseEntity(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles), "Login success!", HttpStatus.OK);
+            return getResponseEntity(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles), "Login success!", HttpStatus.OK);
         } catch (Exception e) {
             return getResponseEntity(null, "Login fail!", HttpStatus.BAD_REQUEST);
         }
@@ -61,26 +62,29 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody(required = false) User user) {
-            try {
-                if (userService.getByUser(user.getUsername()) != null) {
-                    return responseUtils.getResponseEntity(null, "-1", "Username is already exists!", HttpStatus.BAD_REQUEST);
-                }
-                else if(user.getPassword().length() < 6) {
-                    return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-                }
-                else if(user.getPhone().length() < 10) {
-                    return responseUtils.getResponseEntity(null, "-1", "Number phone must be at 11 digit!", HttpStatus.BAD_REQUEST);
-                }
-                else if(user.getRole() != null) {
-                    return responseUtils.getResponseEntity(null, "-1", "you not have permission to access!", HttpStatus.BAD_REQUEST);
-                } else {
-                    user.setRole("USER");
-                    User usersList = userService.save(user);
-                    return responseUtils.getResponseEntity(usersList, "1", "Create user success!", HttpStatus.OK);
-                }
-            } catch (Exception e) {
-                return responseUtils.getResponseEntity(null, "-1", "Create user fail!", HttpStatus.BAD_REQUEST);
+
+        try {
+            if (userService.getByUsername(user.getUsername()) != null) {
+                return responseUtils.getResponseEntity(null, "-1", "Username is already exists!", HttpStatus.BAD_REQUEST);
+            } else if (user.getPassword().length() < 6) {
+                return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
+            } else if (user.getPhone().length() < 10) {
+                return responseUtils.getResponseEntity(null, "-1", "Number phone must be at 11 digit!", HttpStatus.BAD_REQUEST);
+            } else {
+                Set<Role> roles = new HashSet<>();
+                Role roleUser = new Role();
+                roleUser.setId(3L);
+                roleUser.setName("USER");
+
+                roles.add(roleUser);
+                user.setRoles(roles);
+
+                User usersList = userService.save(user);
+                return responseUtils.getResponseEntity(usersList, "1", "Create user success!", HttpStatus.OK);
             }
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(null, "-1", "Create user fail!", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private ResponseEntity<?> getResponseEntity(Object data, String mess, HttpStatus status) {
