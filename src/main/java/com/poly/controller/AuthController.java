@@ -4,6 +4,7 @@ import com.poly.entity.JwtResponse;
 import com.poly.entity.LoginRequest;
 import com.poly.entity.Role;
 import com.poly.entity.User;
+import com.poly.ex.ERole;
 import com.poly.ex.JwtUtils;
 import com.poly.services.AuthService;
 import com.poly.services.ResponseUtils;
@@ -61,7 +62,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody(required = false) User user) {
+    public ResponseEntity<?> signup(@RequestBody User user) {
 
         try {
             if (userService.getByUsername(user.getUsername()) != null) {
@@ -71,16 +72,8 @@ public class AuthController {
             } else if (user.getPhone().length() < 10) {
                 return responseUtils.getResponseEntity(null, "-1", "Number phone must be at 11 digit!", HttpStatus.BAD_REQUEST);
             } else {
-                Set<Role> roles = new HashSet<>();
-                Role roleUser = new Role();
-                roleUser.setId(3L);
-                roleUser.setName("USER");
-
-                roles.add(roleUser);
-                user.setRoles(roles);
-
-                User usersList = userService.save(user);
-                return responseUtils.getResponseEntity(usersList, "1", "Create user success!", HttpStatus.OK);
+                userService.save(user);
+                return responseUtils.getResponseEntity("1", "Create user success!", HttpStatus.OK);
             }
         } catch (Exception e) {
             return responseUtils.getResponseEntity(null, "-1", "Create user fail!", HttpStatus.BAD_REQUEST);

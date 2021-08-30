@@ -3,13 +3,16 @@ package com.poly.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
 @Entity
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,19 +25,30 @@ public class Product {
     private String shortDescription;
     @Column
     private int price;
-    @Column
-    private int priceTop;
-    @Column
-    private int discount;
-    @Column
-    private int discountRate;
-    @Column
-    private double ratingAverage;
-    @Column
-    private int reviewCount;
 
-    @JsonManagedReference
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "products_categories",
+            joinColumns = {@JoinColumn(name = "product_id")},
+            inverseJoinColumns = {@JoinColumn(name = "category_id")})
+    private Set<Category> categories;
+
+    @JsonManagedReference(value = "images_products")
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
-    private List<Image> images;
+    private Set<Image> images;
+
+    @JsonManagedReference(value = "reviews_products")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude
+    private Set<Review> reviews;
+
+    @CreationTimestamp
+    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+//	@Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createTime;
+
+    @UpdateTimestamp
+    @Column(name = "ModifiedLastTime")
+//	@Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime modifiedLastTime;
 }

@@ -2,6 +2,7 @@ package com.poly;
 
 import com.poly.entity.Role;
 import com.poly.entity.User;
+import com.poly.ex.ERole;
 import com.poly.services.RoleService;
 import com.poly.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +30,11 @@ public class ProjectDemoApplication {
 
         List<Role> roleList = (List<Role>) roleService.findAll();
         if (roleList.isEmpty()) {
-            Role roleAdmin = new Role();
-            roleAdmin.setId(1L);
-            roleAdmin.setName("ADMIN");
-            roleService.save(roleAdmin);
-
-            Role roleManager = new Role();
-            roleManager.setId(2L);
-            roleManager.setName("MANAGER");
-            roleService.save(roleManager);
-
-            Role roleUser = new Role();
-            roleUser.setId(3L);
-            roleUser.setName("USER");
-            roleService.save(roleUser);
+            for (ERole roleName : ERole.values()) {
+                Role role = new Role();
+                role.setName(roleName);
+                roleService.save(role);
+            }
         }
 
         List<User> users = (List<User>) userService.findAll();
@@ -52,15 +44,6 @@ public class ProjectDemoApplication {
 
             Role roleAdmin = new Role();
             roleAdmin.setId(1L);
-            roleAdmin.setName("ADMIN");
-
-            Role roleManager = new Role();
-            roleManager.setId(2L);
-            roleManager.setName("MANAGER");
-
-            Role roleUser = new Role();
-            roleUser.setId(3L);
-            roleUser.setName("USER");
 
             roles.add(roleAdmin);
 

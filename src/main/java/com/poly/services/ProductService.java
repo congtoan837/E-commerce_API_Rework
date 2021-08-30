@@ -10,11 +10,15 @@ import java.util.Optional;
 
 public interface ProductService {
 
-    List<Product> findByNameLike(String name);
+    Page<Product> getAllProduct(String name, Pageable pageable);
 
     Product findByName(String name);
 
     Product findByUrl(String url);
+
+    Product getById(Long id);
+
+    List<Product> findAll();
 
     Page<Product> findAll(Pageable pageable);
 

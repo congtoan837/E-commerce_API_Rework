@@ -1,5 +1,6 @@
 package com.poly.services;
 
+import com.poly.dto.UserGetDto;
 import com.poly.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,8 +11,11 @@ import java.util.Optional;
 
 public interface UserService {
 
+    Optional<User> findById(Long aLong);
 
-    Page<User> findAll(Pageable pageable);
+    User getById(Long id);
+
+    Page<User> getAllUser(String Username, Pageable pageable);
 
     User getByUsername(String username);
 
@@ -19,7 +23,7 @@ public interface UserService {
 
     List<User> saveAll(List<User> entities);
 
-    Optional<User> findById(Long aLong);
+    User getOne(Long aLong);
 
     void deleteById(Long aLong);
 

@@ -26,7 +26,7 @@ public class AuthService implements UserDetails {
 
 	public static AuthService build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
-				new SimpleGrantedAuthority(role.getName())
+				new SimpleGrantedAuthority(role.getName().name())
 		).collect(Collectors.toList());
 
 		return new AuthService(user, authorities);

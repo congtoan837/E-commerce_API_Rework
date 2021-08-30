@@ -34,7 +34,7 @@ public class ResponseUtils {
         response.put("data",data);
         response.put("code",code);
         response.put("messenger",mess);
-        response.put("totalRow",totalRow);
+        response.put("TotalRow",totalRow);
         return new ResponseEntity<>(response, status);
     }
 

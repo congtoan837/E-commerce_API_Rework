@@ -1,5 +1,6 @@
 package com.poly.entity;
 
+import com.poly.ex.ERole;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -12,5 +13,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private ERole name;
 }

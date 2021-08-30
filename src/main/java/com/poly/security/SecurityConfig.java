@@ -24,36 +24,36 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
+
 	@Autowired
     AuthServiceImp authServiceImp;
 
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
-	
+
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
 	}
-	
+
 	@Bean
-	PasswordEncoder PasswordEncoder() {		
+	PasswordEncoder PasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
             throws Exception {
         auth.userDetailsService(authServiceImp)
 				.passwordEncoder(new MyPasswordEncoder());
-    }	
-    
+    }
+
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -62,16 +62,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
 			.authorizeRequests()
-			.antMatchers("/signin*").permitAll()
-			.antMatchers("/signup*").permitAll()
+				.antMatchers("/signin").permitAll()
+				.antMatchers("/signup").permitAll()
+				.antMatchers("/product/getAllProduct*").permitAll()
+				.antMatchers("/v2/api-docs",
+						"/configuration/ui",
+						"/swagger-resources/**",
+						"/configuration/security",
+						"/swagger-ui.html",
+						"/webjars/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.formLogin()
 			.and()
-			.httpBasic();			
+			.httpBasic();
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
-	
+
 	@Bean
 	public FilterRegistrationBean customCorsFilter() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
