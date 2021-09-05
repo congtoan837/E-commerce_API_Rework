@@ -25,74 +25,89 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
+    @Autowired
     AuthServiceImp authServiceImp;
 
-	@Autowired
-	private AuthEntryPointJwt unauthorizedHandler;
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
-	@Bean
-	public AuthTokenFilter authenticationJwtTokenFilter() {
-		return new AuthTokenFilter();
-	}
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 
-	@Bean
-	PasswordEncoder PasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder PasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
             throws Exception {
         auth.userDetailsService(authServiceImp)
-				.passwordEncoder(new MyPasswordEncoder());
+                .passwordEncoder(new PasswordEncoder() {
+                    final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+                    @Override
+                    public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                        // Decoding stuff on the encrypted password sended by the client (rawPassword)
+                        return encoder.matches(rawPassword, encodedPassword);
+                    }
+
+                    @Override
+                    public String encode(CharSequence rawPassword) {
+                        //Same crypto operation to get the plain password
+                        return encoder.encode(rawPassword);
+                    }
+                });
     }
 
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.cors().and().csrf().disable()
-				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
-			.authorizeRequests()
-				.antMatchers("/signin").permitAll()
-				.antMatchers("/signup").permitAll()
-				.antMatchers("/product/getAllProduct*").permitAll()
-				.antMatchers("/v2/api-docs",
-						"/configuration/ui",
-						"/swagger-resources/**",
-						"/configuration/security",
-						"/swagger-ui.html",
-						"/webjars/**").permitAll()
-			.anyRequest().authenticated()
-			.and()
-			.formLogin()
-			.and()
-			.httpBasic();
-		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .cors().and().csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/signin").permitAll()
+                .antMatchers("/signup").permitAll()
+                .antMatchers("/product/getAllProduct*").permitAll()
+                .antMatchers("/user/**").hasAuthority("ADMIN")
+                .antMatchers("/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/security",
+                        "/swagger-ui.html",
+                        "/webjars/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .and()
+                .httpBasic();
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
 
-	@Bean
-	public FilterRegistrationBean customCorsFilter() {
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowCredentials(true);
-		config.addAllowedOrigin("*");
-		config.addAllowedHeader("*");
-		config.addAllowedMethod("GET");
-		config.addAllowedMethod("POST");
-		config.addAllowedMethod("PUT");
-		config.addAllowedMethod("DELETE");
-		source.registerCorsConfiguration("/**", config);
-		FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-		return bean;
-	}
+    @Bean
+    public FilterRegistrationBean customCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("DELETE");
+        source.registerCorsConfiguration("/**", config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
 }

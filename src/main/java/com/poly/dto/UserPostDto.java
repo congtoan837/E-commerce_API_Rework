@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class UserGetDto {
+public class UserPostDto {
     private UUID id;
 
     private String name;
@@ -22,17 +22,9 @@ public class UserGetDto {
 
     private String address;
 
-    private String image;
-
-    private boolean enabled;
-
     private String username;
 
+    private String password;
+
     private Set<Role> roles;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime createTime;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime modifiedLastTime;
 }

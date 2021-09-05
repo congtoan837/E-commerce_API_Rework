@@ -6,6 +6,7 @@ import com.poly.repositories.UserRepository;
 import com.poly.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -20,18 +22,8 @@ public class UserServiceImp implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public Optional<User> findById(Long aLong) {
-        return userRepository.findById(aLong);
-    }
-
-    @Override
-    public User getById(Long id) {
+    public User getById(UUID id) {
         return userRepository.getById(id);
-    }
-
-    @Override
-    public Page<User> getAllUser(String Username, Pageable pageable) {
-        return userRepository.getAllUser(Username, pageable);
     }
 
     @Override
@@ -40,48 +32,22 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public User save(User entity) {
+    public Page<User> getAllUser(String user, Pageable pageable) {
+        return userRepository.getAllUser(user, pageable);
+    }
+
+    @Override
+    public <S extends User> S save(S entity) {
         return userRepository.save(entity);
     }
 
     @Override
-    public List<User> saveAll(List<User> entities) {
-        return userRepository.saveAll(entities);
-    }
-
-    @Override
-    public User getOne(Long aLong) {
-        return userRepository.getOne(aLong);
-    }
-
-    @Override
-    public void deleteById(Long aLong) {
-        userRepository.deleteById(aLong);
+    public void deleteById(UUID uuid) {
+        userRepository.deleteById(uuid);
     }
 
     @Override
     public Iterable<User> findAll() {
         return userRepository.findAll();
-    }
-
-    @Override
-    public long count() {
-        return userRepository.count();
-    }
-
-
-    @Override
-    public void delete(User entity) {
-        userRepository.delete(entity);
-    }
-
-    @Override
-    public void deleteAll(List<User> entities) {
-        userRepository.deleteAll(entities);
-    }
-
-    @Override
-    public void deleteAll() {
-        userRepository.deleteAll();
     }
 }

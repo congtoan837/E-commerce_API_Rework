@@ -6,14 +6,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AuthService implements UserDetails {
-	
+
 	private User users;
 
 	private Collection<? extends GrantedAuthority> roles;
@@ -32,7 +29,7 @@ public class AuthService implements UserDetails {
 		return new AuthService(user, authorities);
 	}
 
-	public Long getId() {
+	public UUID getId() {
 		return users.getId();
 	}
 

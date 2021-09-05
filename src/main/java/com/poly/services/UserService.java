@@ -8,32 +8,19 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
 
-    Optional<User> findById(Long aLong);
-
-    User getById(Long id);
-
-    Page<User> getAllUser(String Username, Pageable pageable);
+    User getById(UUID id);
 
     User getByUsername(String username);
 
-    User save(User entity);
+    Page<User> getAllUser(String user, Pageable pageable);
 
-    List<User> saveAll(List<User> entities);
+    <S extends User> S save(S entity);
 
-    User getOne(Long aLong);
-
-    void deleteById(Long aLong);
+    void deleteById(UUID uuid);
 
     Iterable<User> findAll();
-
-    long count();
-
-    void delete(User entity);
-
-    void deleteAll(List<User> entities);
-
-    void deleteAll();
 }
