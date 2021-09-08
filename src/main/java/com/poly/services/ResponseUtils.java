@@ -14,6 +14,10 @@ public class ResponseUtils {
 
     Logger LOGGER = Logger.getLogger(ResponseUtils.class);
 
+    public ResponseEntity<?> getResponseEntity(HttpStatus status) {
+        return new ResponseEntity<>(status);
+    }
+
     public ResponseEntity<?> getResponseEntity(String code, String mess, HttpStatus status) {
         Map<String, Object> response = new HashMap<>();
         response.put("code",code);

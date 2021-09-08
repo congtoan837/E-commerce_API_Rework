@@ -1,19 +1,22 @@
 package com.poly.controller;
 
-import com.poly.dto.SignupRequest;
-import com.poly.dto.UserPostDto;
-import com.poly.entity.JwtResponse;
 import com.poly.dto.LoginRequest;
+import com.poly.dto.SignupRequest;
+import com.poly.entity.JwtResponse;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.JwtUtils;
+import com.poly.ex.Utility;
 import com.poly.services.AuthService;
 import com.poly.services.ResponseUtils;
 import com.poly.services.UserService;
+import net.bytebuddy.utility.RandomString;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +24,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,7 +45,7 @@ public class AuthController {
     UserService userService;
 
     @Autowired
-    PasswordEncoder encoder;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -47,7 +54,9 @@ public class AuthController {
     private ModelMapper mapper;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private JavaMailSender mailSender;
+
+    private Utility utility;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -68,7 +77,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequest request, HttpServletRequest servletRequest) {
         try {
             if (userService.getByUsername(request.getUsername()) != null) {
                 return responseUtils.getResponseEntity(null, "-1", "Username is already exists!", HttpStatus.BAD_REQUEST);
@@ -76,11 +85,12 @@ public class AuthController {
                 return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
             } else if (request.getPassword().length() < 6) {
                 return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            } else if (!request.getPhone().matches("[0-9]+") || request.getPhone().length() != 10) {
-                return responseUtils.getResponseEntity(null, "-1", "Phone number is not in the correct formatting!", HttpStatus.BAD_REQUEST);
+            } else if (!request.getEmail().matches("[A-Z0-9]+@[A-Z0-9]+.[A-Z0-9]+")) {
+                return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
             } else {
                 User user = mapper.map(request, User.class);
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
+                user.setVerifyCode(RandomString.make(64));
 
                 Set<Role> roles = new HashSet<>();
                 Role role = new Role();
@@ -91,13 +101,57 @@ public class AuthController {
                 if (user.getImage() == null) {
                     user.setImage("https://congtoan-bucket.s3.ap-southeast-1.amazonaws.com/1630749704358-avatar.png");
                 }
-                userService.save(user);
+                User response = userService.save(user);
 
+                String siteURL = utility.getSiteURL(servletRequest);
+
+                try {
+                    sendVerificationEmail(request, response, siteURL);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
                 return responseUtils.getResponseEntity("1", "Create user success!", HttpStatus.OK);
             }
         } catch (Exception e) {
             return responseUtils.getResponseEntity(null, "-1", "Create user fail!", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyAccount(@RequestParam("code") String code) {
+        try {
+            User user = userService.getByVerifyCode(code);
+            if (!user.isEnabled()) {
+                userService.findByVerifyCodeAndEnable(code);
+                user.setVerifyCode(null);
+                return responseUtils.getResponseEntity(HttpStatus.OK);
+            } else {
+                return responseUtils.getResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void sendVerificationEmail(SignupRequest request, User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        String subject = "Kích hoạt tài khoản của bạn";
+        String senderMail = "congtoan837@gmail.com";
+        String senderName = "E-Commerce";
+        String mailContent = "<p>Xin chào " + request.getName() + ",</p>";
+        mailContent += "<p>Để kích hoạt tài khoản, bạn vui lòng nhấp vào link dưới đây:</p>";
+        mailContent += "<p>" + siteURL + "/verify?code=" + user.getVerifyCode() + "</p>";
+        mailContent += "<p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
+
+        message.setContent(mailContent, "text/html; charset=utf-8");
+
+        helper.setTo(request.getEmail());
+        helper.setFrom(senderMail, senderName);
+        helper.setSubject(subject);
+
+        this.mailSender.send(message);
     }
 
     private ResponseEntity<?> getResponseEntity(Object data, String mess, HttpStatus status) {
