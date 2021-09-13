@@ -9,6 +9,7 @@ import com.poly.services.AuthService;
 import com.poly.services.ResponseUtils;
 import com.poly.services.UserService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,37 +22,40 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
     @Autowired
     ResponseUtils responseUtils;
-
     @Autowired
     UserService userService;
-
-
     @Autowired
     private ModelMapper mapper;
-
     @Autowired
     private AmazonClient amazonClient;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validate(String emailStr) {
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
+        return matcher.find();
+    }
 
     @GetMapping("/getAllUser")
     public ResponseEntity<?> getAllUser(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy,
                                         @RequestParam String sortType, @RequestParam(defaultValue = "") String search) {
         try {
             String S = sortType.trim().toLowerCase();
-            Page<User> users = userService.getAllUser(search, PageRequest.of(page, size, Sort.by(S.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy)));
+            Page<User> users = userService.getAllUser(search, PageRequest.of(page, size, Sort.by(S.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)));
             Page<Object> result = users.map(user -> mapper.map(user, UserGetDto.class));
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get user success!", users.getTotalElements(), HttpStatus.OK);
-
         } catch (Exception e) {
             return responseUtils.getResponseEntity("-1", "Get user fail!", HttpStatus.BAD_REQUEST);
         }
@@ -66,8 +70,8 @@ public class UserController {
                 return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
             } else if (request.getPassword().length() < 6) {
                 return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            } else if (!request.getPhone().matches("[0-9]+") || request.getPhone().length() != 10) {
-                return responseUtils.getResponseEntity(null, "-1", "Phone number is not in the correct formatting!", HttpStatus.BAD_REQUEST);
+            } else if (!validate(request.getEmail())) {
+                return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
             } else {
                 User user = mapper.map(request, User.class);
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -87,23 +91,22 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestBody UserPostDto request) {
         try {
             UUID id = request.getId();
-            User getUser = userService.getById(id);
+            User user = userService.getById(id);
 
-            if (getUser != null) {
-                if (request.getUsername().length() < 6) {
-                    return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-                } else if (request.getPassword().length() < 6) {
+            if (user != null) {
+                if (request.getPassword().length() < 6) {
                     return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-                } else if (!request.getPhone().matches("[0-9]+") || request.getPhone().length() != 10) {
-                    return responseUtils.getResponseEntity(null, "-1", "Phone number is not in the correct formatting!", HttpStatus.BAD_REQUEST);
+                } else if (!validate(request.getEmail())) {
+                    return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
                 } else {
-                    getUser.setName(request.getName());
-                    getUser.setEmail(request.getEmail().trim());
-                    getUser.setAddress(request.getAddress());
-                    userService.save(getUser);
-
-                    UserGetDto userMapper = mapper.map(getUser, UserGetDto.class);
-                    return responseUtils.getResponseEntity(userMapper, "1", "Update user success!", HttpStatus.OK);
+                    user.setName(request.getName());
+                    user.setAddress(request.getAddress());
+                    user.setPassword(passwordEncoder.encode(request.getPassword()));
+                    if (request.getRoles().size() > 0) {
+                        user.setRoles(request.getRoles());
+                    }
+                    userService.save(user);
+                    return responseUtils.getResponseEntity("1", "Update user success!", HttpStatus.OK);
                 }
             } else {
                 return responseUtils.getResponseEntity("-1", "User not found!", HttpStatus.BAD_REQUEST);
@@ -130,7 +133,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/uploadAvatar")
+    @PutMapping("/uploadAvatar")
     public ResponseEntity<?> deleteUser(@ModelAttribute MultipartFile file, Authentication authentication) {
         try {
             AuthService auth = (AuthService) authentication.getPrincipal();

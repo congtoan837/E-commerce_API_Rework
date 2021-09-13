@@ -29,6 +29,8 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
@@ -56,7 +58,13 @@ public class AuthController {
     @Autowired
     private JavaMailSender mailSender;
 
-    private Utility utility;
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validate(String emailStr) {
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
+        return matcher.find();
+    }
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -85,7 +93,7 @@ public class AuthController {
                 return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
             } else if (request.getPassword().length() < 6) {
                 return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            } else if (!request.getEmail().matches("[A-Z0-9]+@[A-Z0-9]+.[A-Z0-9]+")) {
+            } else if (!validate(request.getEmail())){
                 return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
             } else {
                 User user = mapper.map(request, User.class);
@@ -103,12 +111,12 @@ public class AuthController {
                 }
                 User response = userService.save(user);
 
-                String siteURL = utility.getSiteURL(servletRequest);
+                String siteURL = Utility.getSiteURL(servletRequest);
 
                 try {
                     sendVerificationEmail(request, response, siteURL);
                 } catch (Exception e) {
-                    System.out.println(e);
+                    System.out.println(e.getMessage());
                 }
                 return responseUtils.getResponseEntity("1", "Create user success!", HttpStatus.OK);
             }

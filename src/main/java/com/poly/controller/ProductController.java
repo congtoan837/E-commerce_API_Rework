@@ -2,7 +2,6 @@ package com.poly.controller;
 
 import com.poly.dto.ProductGetDto;
 import com.poly.entity.Product;
-import com.poly.entity.User;
 import com.poly.services.ProductService;
 import com.poly.services.ResponseUtils;
 import com.poly.services.ReviewService;
@@ -13,11 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -40,14 +35,7 @@ public class ProductController {
                                            @RequestParam String sortType, @RequestParam(defaultValue = "") String search) {
         try {
             String S = sortType.trim().toLowerCase();
-            Sort.Direction dir = null;
-            if (S.equals("asc")) {
-                dir = Sort.Direction.ASC;
-            } else if (S.equals("desc")) {
-                dir = Sort.Direction.DESC;
-            }
-
-            Page<Product> products = productService.getAllProduct(search, PageRequest.of(page, size, Sort.by(dir, sortBy)));
+            Page<Product> products = productService.getAllProduct(search, PageRequest.of(page, size, Sort.by(S.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)));
             Page<Object> result = products.map(product -> mapper.map(product, ProductGetDto.class));
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get product success!", products.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
@@ -56,24 +44,19 @@ public class ProductController {
     }
 
     @PostMapping("/createProduct")
-    public ResponseEntity<?> createProduct(@RequestBody Product product, Authentication authentication) {
+    public ResponseEntity<?> createProduct(@RequestBody Product product) {
         try {
-            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-
-                if (productService.findByName(product.getName()) != null) {
-                    return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
-                } else if (productService.findByUrl(product.getUrl()) != null) {
-                    return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
-                } else if (product.getUrl() == null || product.getUrl().equals("")) {
-                    return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-                } else if (product.getPrice() < 0) {
-                    return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
-                } else {
-                    productService.save(product);
-                    return responseUtils.getResponseEntity("1", "Create product success!", HttpStatus.OK);
-                }
+            if (productService.findByName(product.getName()) != null) {
+                return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
+            } else if (productService.findByUrl(product.getUrl()) != null) {
+                return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
+            } else if (product.getUrl() == null || product.getUrl().equals("")) {
+                return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
+            } else if (product.getPrice() < 0) {
+                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
             } else {
-                return responseUtils.getResponseEntity("-1", "You not have permission to access!", HttpStatus.BAD_REQUEST);
+                productService.save(product);
+                return responseUtils.getResponseEntity("1", "Create product success!", HttpStatus.OK);
             }
         } catch (Exception e) {
             return responseUtils.getResponseEntity("-1", "Create product fail!", HttpStatus.BAD_REQUEST);
@@ -81,43 +64,38 @@ public class ProductController {
     }
 
     @PutMapping("/updateProduct")
-    public ResponseEntity<?> updateProduct(@RequestBody Product product, Authentication authentication) {
+    public ResponseEntity<?> updateProduct(@RequestBody Product product) {
         try {
-            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-
-                if (productService.findByName(product.getName()) != null) {
-                    return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
-                } else if (productService.findByUrl(product.getUrl()) != null) {
-                    return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
-                } else if (product.getUrl() == null || product.getUrl().equals("")) {
-                    return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-                } else if (product.getPrice() < 0) {
-                    return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
-                } else {
-                    Long id = product.getId();
-                    Product getProduct = productService.getById(id);
-
-                    if (getProduct != null) {
-                        getProduct.setName(product.getName());
-                        getProduct.setUrl(product.getUrl().trim());
-                        getProduct.setShortDescription(product.getShortDescription());
-                        getProduct.setPrice(product.getPrice());
-
-                        if (product.getCategories().size() > 0) {
-                            getProduct.setCategories(product.getCategories());
-                        }
-                        if (product.getImages().size() > 0) {
-                            getProduct.setImages(product.getImages());
-                        }
-
-                        productService.save(getProduct);
-                        return responseUtils.getResponseEntity("1", "Update product success!", HttpStatus.OK);
-                    } else {
-                        return responseUtils.getResponseEntity("-1", "Product " + id + " not found!", HttpStatus.BAD_REQUEST);
-                    }
-                }
+            if (productService.findByName(product.getName()) != null) {
+                return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
+            } else if (productService.findByUrl(product.getUrl()) != null) {
+                return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
+            } else if (product.getUrl() == null || product.getUrl().equals("")) {
+                return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
+            } else if (product.getPrice() < 0) {
+                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
             } else {
-                return responseUtils.getResponseEntity("-1", "You not have permission to access!", HttpStatus.BAD_REQUEST);
+                Long id = product.getId();
+                Product getProduct = productService.getById(id);
+
+                if (getProduct != null) {
+                    getProduct.setName(product.getName());
+                    getProduct.setUrl(product.getUrl().trim());
+                    getProduct.setShortDescription(product.getShortDescription());
+                    getProduct.setPrice(product.getPrice());
+
+                    if (product.getCategories().size() > 0) {
+                        getProduct.setCategories(product.getCategories());
+                    }
+                    if (product.getImages().size() > 0) {
+                        getProduct.setImages(product.getImages());
+                    }
+
+                    productService.save(getProduct);
+                    return responseUtils.getResponseEntity("1", "Update product success!", HttpStatus.OK);
+                } else {
+                    return responseUtils.getResponseEntity("-1", "Product " + id + " not found!", HttpStatus.BAD_REQUEST);
+                }
             }
         } catch (Exception e) {
             return responseUtils.getResponseEntity("-1", "Update product fail!", HttpStatus.BAD_REQUEST);
@@ -125,18 +103,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/deleteProduct/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         try {
             Product getProduct = productService.getById(id);
-            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-                if (getProduct == null) {
-                    return responseUtils.getResponseEntity("-1", "Product " + id + " not found!", HttpStatus.BAD_REQUEST);
-                } else {
-                    productService.deleteById(id);
-                    return responseUtils.getResponseEntity("1", "Delete product success!", HttpStatus.OK);
-                }
+            if (getProduct == null) {
+                return responseUtils.getResponseEntity("-1", "Product " + id + " not found!", HttpStatus.BAD_REQUEST);
             } else {
-                return responseUtils.getResponseEntity("-1", "You not have permission to access!", HttpStatus.BAD_REQUEST);
+                productService.deleteById(id);
+                return responseUtils.getResponseEntity("1", "Delete product success!", HttpStatus.OK);
             }
         } catch (Exception e) {
             return responseUtils.getResponseEntity("-1", "Server error!", HttpStatus.BAD_REQUEST);

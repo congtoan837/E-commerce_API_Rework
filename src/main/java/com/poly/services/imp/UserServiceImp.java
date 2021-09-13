@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +31,18 @@ public class UserServiceImp implements UserService {
     @Override
     public User getByUsername(String username) {
         return userRepository.getByUsername(username);
+    }
+
+    @Override
+    public User getByVerifyCode(String verifyCode) {
+        return userRepository.getByVerifyCode(verifyCode);
+    }
+
+    @Override
+    @Modifying
+    @Transactional
+    public void findByVerifyCodeAndEnable(String code) {
+        userRepository.findByVerifyCodeAndEnable(code);
     }
 
     @Override

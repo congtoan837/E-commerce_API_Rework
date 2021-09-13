@@ -4,8 +4,10 @@ import com.poly.dto.UserGetDto;
 import com.poly.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +17,12 @@ public interface UserService {
     User getById(UUID id);
 
     User getByUsername(String username);
+
+    User getByVerifyCode(String verifyCode);
+
+    @Modifying
+    @Transactional
+    void findByVerifyCodeAndEnable(String code);
 
     Page<User> getAllUser(String user, Pageable pageable);
 

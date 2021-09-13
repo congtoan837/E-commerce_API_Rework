@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class ProductGetDto {
+public class ProductPostDto {
 
     private Long id;
 
@@ -22,6 +22,4 @@ public class ProductGetDto {
     private Set<CategoryGetDto> categories;
 
     private Set<ImageGetDto> images;
-
-    private Set<ReviewGetDto> reviews;
 }
