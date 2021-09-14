@@ -3,6 +3,7 @@ package com.poly.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -15,11 +16,11 @@ public class ProductPostDto {
 
     private String url;
 
-    private String shortDescription;
+    private String note;
 
-    private String price;
+    private BigDecimal price;
 
-    private Set<CategoryGetDto> categories;
+    private Set<CategoryDto> categories;
 
     private Set<ImageGetDto> images;
 }

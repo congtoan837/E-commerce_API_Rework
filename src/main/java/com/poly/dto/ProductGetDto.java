@@ -19,7 +19,7 @@ public class ProductGetDto {
 
     private String price;
 
-    private Set<CategoryGetDto> categories;
+    private Set<CategoryDto> categories;
 
     private Set<ImageGetDto> images;
 

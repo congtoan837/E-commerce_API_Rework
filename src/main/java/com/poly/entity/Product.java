@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -22,11 +24,14 @@ public class Product {
     @Column
     private String url;
     @Column
-    private String shortDescription;
+    private String note;
     @Column
-    private int price;
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal price;
+    @Column
+    private String status;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(name = "products_categories",
             joinColumns = {@JoinColumn(name = "product_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})

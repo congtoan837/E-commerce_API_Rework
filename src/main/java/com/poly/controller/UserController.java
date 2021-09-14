@@ -9,7 +9,6 @@ import com.poly.services.AuthService;
 import com.poly.services.ResponseUtils;
 import com.poly.services.UserService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,10 +28,12 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    private static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     @Autowired
-    ResponseUtils responseUtils;
+    private ResponseUtils responseUtils;
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
     private ModelMapper mapper;
     @Autowired
@@ -40,10 +41,7 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
-            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-
-    public static boolean validate(String emailStr) {
+    private static boolean validate(String emailStr) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
         return matcher.find();
     }
@@ -90,15 +88,15 @@ public class UserController {
     @PutMapping("/updateUser")
     public ResponseEntity<?> updateUser(@RequestBody UserPostDto request) {
         try {
-            UUID id = request.getId();
-            User user = userService.getById(id);
+            if (request.getUsername().length() < 6) {
+                return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
+            } else if (request.getPassword().length() < 6) {
+                return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
+            } else {
+                UUID id = request.getId();
+                User user = userService.getById(id);
 
-            if (user != null) {
-                if (request.getPassword().length() < 6) {
-                    return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-                } else if (!validate(request.getEmail())) {
-                    return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
-                } else {
+                if (user != null) {
                     user.setName(request.getName());
                     user.setAddress(request.getAddress());
                     user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -107,9 +105,9 @@ public class UserController {
                     }
                     userService.save(user);
                     return responseUtils.getResponseEntity("1", "Update user success!", HttpStatus.OK);
+                } else {
+                    return responseUtils.getResponseEntity("-1", "User not found!", HttpStatus.BAD_REQUEST);
                 }
-            } else {
-                return responseUtils.getResponseEntity("-1", "User not found!", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             return responseUtils.getResponseEntity("-1", "Update user fail!", HttpStatus.BAD_REQUEST);

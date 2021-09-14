@@ -1,10 +1,10 @@
 package com.poly.controller;
 
-import com.poly.dto.ProductGetDto;
-import com.poly.entity.Product;
-import com.poly.services.ProductService;
-import com.poly.services.ResponseUtils;
-import com.poly.services.ReviewService;
+import com.poly.dto.*;
+import com.poly.entity.*;
+import com.poly.services.*;
+
+import com.poly.ex.Utility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +13,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -44,17 +47,21 @@ public class ProductController {
     }
 
     @PostMapping("/createProduct")
-    public ResponseEntity<?> createProduct(@RequestBody Product product) {
+    public ResponseEntity<?> createProduct(@RequestBody ProductPostDto request, HttpServletRequest HttpRequest) {
         try {
-            if (productService.findByName(product.getName()) != null) {
+            if (productService.findByName(request.getName()) != null) {
                 return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (productService.findByUrl(product.getUrl()) != null) {
+            } else if (request.getName() == null || request.equals("")) {
+                return responseUtils.getResponseEntity("-1", "Product name cant be null!", HttpStatus.BAD_REQUEST);
+            } else if (productService.findByUrl(request.getUrl()) != null) {
                 return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (product.getUrl() == null || product.getUrl().equals("")) {
+            } else if (request.getUrl() == null || request.getUrl().equals("")) {
                 return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-            } else if (product.getPrice() < 0) {
+            } else if (request.getPrice().compareTo(BigDecimal.ZERO) < 0) {
                 return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
             } else {
+                Product product = mapper.map(request, Product.class);
+                product.setUrl(Utility.getSiteURL(HttpRequest) + "/product/" + request.getUrl());
                 productService.save(product);
                 return responseUtils.getResponseEntity("1", "Create product success!", HttpStatus.OK);
             }
@@ -72,8 +79,8 @@ public class ProductController {
                 return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
             } else if (product.getUrl() == null || product.getUrl().equals("")) {
                 return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-            } else if (product.getPrice() < 0) {
-                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
+//            } else if (product.getPrice() < 0) {
+//                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
             } else {
                 Long id = product.getId();
                 Product getProduct = productService.getById(id);
@@ -81,7 +88,7 @@ public class ProductController {
                 if (getProduct != null) {
                     getProduct.setName(product.getName());
                     getProduct.setUrl(product.getUrl().trim());
-                    getProduct.setShortDescription(product.getShortDescription());
+                    getProduct.setNote(product.getNote());
                     getProduct.setPrice(product.getPrice());
 
                     if (product.getCategories().size() > 0) {
