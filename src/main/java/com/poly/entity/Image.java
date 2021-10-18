@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class Image {
+public class Image extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -27,13 +27,4 @@ public class Image {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createTime;
-
-    @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modifiedLastTime;
 }

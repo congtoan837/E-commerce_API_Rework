@@ -35,7 +35,7 @@ public class CategoryController {
         try {
             String S = sortType.trim().toLowerCase();
             Page<Category> categories = categoryService.pageSearchCategory(search, PageRequest.of(page, size, Sort.by(S.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)));
-            Page<Object> result = categories.map(category -> mapper.map(category, UserGetDto.class));
+            Page<Object> result = categories.map(category -> mapper.map(category, Category.class));
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get category success!", categories.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
             return responseUtils.getResponseEntity("-1", "Get category fail!", HttpStatus.BAD_REQUEST);

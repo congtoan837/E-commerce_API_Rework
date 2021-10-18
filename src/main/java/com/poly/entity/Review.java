@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name="reviews")
-public class Review {
+@Table(name = "reviews")
+public class Review extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,23 +29,13 @@ public class Review {
     @Column
     private String comment;
 
-    @JsonBackReference(value="reviews_products")
+    @JsonBackReference(value = "reviews_products")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @JsonBackReference(value="reviews_users")
+    @JsonBackReference(value = "reviews_users")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createTime;
-
-    @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modifiedLastTime;
 }

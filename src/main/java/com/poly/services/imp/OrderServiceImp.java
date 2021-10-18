@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class OrderServiceImp implements OrderService {
@@ -17,43 +17,28 @@ public class OrderServiceImp implements OrderService {
     OrderRepository orderRepository;
 
     @Override
-    public List<Order> findByUserId(Long userId) {
+    public List<Order> findByStatus(byte status) {
+        return orderRepository.findByStatus(status);
+    }
+
+    @Override
+    public Page<Order> getAllOrder(String user, Pageable pageable) {
+        return orderRepository.getAllOrder(user, pageable);
+    }
+
+    @Override
+    public Order getById(Long id) {
+        return orderRepository.getById(id);
+    }
+
+    @Override
+    public List<Order> findByUserId(UUID userId) {
         return orderRepository.findByUserId(userId);
     }
 
     @Override
-    public List<Order> findByOrderStatus(Long orderStatus) {
-        return orderRepository.findByOrderStatus(orderStatus);
-    }
-
-    @Override
-    public List<Order> findOrderByUser(String user) {
-        return orderRepository.findOrderByUser(user);
-    }
-
-    @Override
-    public Order getOne(Long aLong) {
-        return orderRepository.getOne(aLong);
-    }
-
-    @Override
-    public Page<Order> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable);
-    }
-
-    @Override
-    public Order save(Order entity) {
+    public <S extends Order> S save(S entity) {
         return orderRepository.save(entity);
-    }
-
-    @Override
-    public Optional<Order> findById(Long aLong) {
-        return orderRepository.findById(aLong);
-    }
-
-    @Override
-    public long count() {
-        return orderRepository.count();
     }
 
     @Override

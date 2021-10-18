@@ -12,8 +12,6 @@ import java.util.Map;
 @Service
 public class ResponseUtils {
 
-    Logger LOGGER = Logger.getLogger(ResponseUtils.class);
-
     public ResponseEntity<?> getResponseEntity(HttpStatus status) {
         return new ResponseEntity<>(status);
     }

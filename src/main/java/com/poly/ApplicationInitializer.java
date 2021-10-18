@@ -15,20 +15,20 @@ import java.util.List;
 import java.util.Set;
 
 @SpringBootApplication
-public class ProjectDemoApplication {
+public class ApplicationInitializer {
     @Autowired
     private UserService userService;
     @Autowired
     private RoleService roleService;
 
     public static void main(String[] args) {
-        SpringApplication.run(ProjectDemoApplication.class, args);
+        SpringApplication.run(ApplicationInitializer.class, args);
     }
 
     @PostConstruct
     public void init() {
 
-        List<Role> roleList = (List<Role>) roleService.findAll();
+        List<Role> roleList = roleService.findAll();
         if (roleList.isEmpty()) {
             for (ERole roleName : ERole.values()) {
                 Role role = new Role();

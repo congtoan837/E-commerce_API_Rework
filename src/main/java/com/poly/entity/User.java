@@ -16,7 +16,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User extends Auditable<String> {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -59,14 +59,4 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
     private Set<Review> reviews;
-
-    @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createTime;
-
-    @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modifiedLastTime;
 }

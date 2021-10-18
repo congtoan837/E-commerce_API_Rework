@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class UsersController {
     private static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     @Autowired
@@ -88,9 +88,7 @@ public class UserController {
     @PutMapping("/updateUser")
     public ResponseEntity<?> updateUser(@RequestBody UserPostDto request) {
         try {
-            if (request.getUsername().length() < 6) {
-                return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            } else if (request.getPassword().length() < 6) {
+            if (request.getPassword().length() < 6) {
                 return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
             } else {
                 UUID id = request.getId();

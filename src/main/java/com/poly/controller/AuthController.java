@@ -2,7 +2,8 @@ package com.poly.controller;
 
 import com.poly.dto.LoginRequest;
 import com.poly.dto.SignupRequest;
-import com.poly.entity.JwtResponse;
+import com.poly.dto.JwtResponse;
+import com.poly.dto.UserDto;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.JwtUtils;
@@ -78,10 +79,21 @@ public class AuthController {
             AuthService userDetails = (AuthService) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                     .collect(Collectors.toList());
-            return getResponseEntity(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles), "Login success!", HttpStatus.OK);
+            return getResponseEntity(new JwtResponse(jwt, userDetails.getId(), userDetails.getName(), roles), "Login success!", HttpStatus.OK);
         } catch (Exception e) {
-            return getResponseEntity(null, "Login fail!", HttpStatus.BAD_REQUEST);
+            return getResponseEntity(null, "username or password is incorrect!", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/user")
+    public ResponseEntity<?> currentUser(Authentication authentication) {
+        AuthService auth = (AuthService) authentication.getPrincipal();
+        UserDto user = new UserDto();
+        user.setId(auth.getId());
+        user.setUsername(auth.getUsername());
+        user.setName(auth.getName());
+        user.setImage(auth.getImage());
+        return responseUtils.getResponseEntity(user, "1", "Get user success!", HttpStatus.OK);
     }
 
     @PostMapping("/signup")
@@ -106,9 +118,7 @@ public class AuthController {
                 roles.add(role);
 
                 user.setRoles(roles);
-                if (user.getImage() == null) {
-                    user.setImage("https://congtoan-bucket.s3.ap-southeast-1.amazonaws.com/1630749704358-avatar.png");
-                }
+
                 User response = userService.save(user);
 
                 String siteURL = Utility.getSiteURL(servletRequest);
@@ -164,9 +174,9 @@ public class AuthController {
 
     private ResponseEntity<?> getResponseEntity(Object data, String mess, HttpStatus status) {
         Map<String, Object> response = new HashMap<>();
-        response.put("Data", data);
-        response.put("Status", status);
-        response.put("Messenger", mess);
+        response.put("data", data);
+        response.put("status", status);
+        response.put("messenger", mess);
         return new ResponseEntity<>(response, status);
     }
 }

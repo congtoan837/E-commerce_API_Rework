@@ -14,13 +14,9 @@ public class ProductPostDto {
 
     private String name;
 
-    private String url;
-
     private String note;
 
     private BigDecimal price;
 
     private Set<CategoryDto> categories;
-
-    private Set<ImageGetDto> images;
 }

@@ -1,10 +1,17 @@
 package com.poly.controller;
 
-import com.poly.dto.*;
-import com.poly.entity.*;
-import com.poly.services.*;
-
-import com.poly.ex.Utility;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.poly.dto.ImageDto;
+import com.poly.dto.ProductDetailGetDto;
+import com.poly.dto.ProductGetDto;
+import com.poly.dto.ProductPostDto;
+import com.poly.entity.Image;
+import com.poly.entity.Product;
+import com.poly.ex.AmazonClient;
+import com.poly.services.ProductService;
+import com.poly.services.ResponseUtils;
+import com.poly.services.ReviewService;
+import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,9 +20,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.Normalizer;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -33,6 +48,32 @@ public class ProductController {
     @Autowired
     private ModelMapper mapper;
 
+    @Autowired
+    private AmazonClient amazonClient;
+
+    private static String convert(String str) {
+        //Đổi ký tự có dấu thành không dấu
+        str = str.replaceAll("à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ", "a");
+        str = str.replaceAll("è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ", "e");
+        str = str.replaceAll("ì|í|ị|ỉ|ĩ", "i");
+        str = str.replaceAll("ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ", "o");
+        str = str.replaceAll("ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ", "u");
+        str = str.replaceAll("ỳ|ý|ỵ|ỷ|ỹ", "y");
+        str = str.replaceAll("đ", "d");
+
+        str = str.replaceAll("À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ", "A");
+        str = str.replaceAll("È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ", "E");
+        str = str.replaceAll("Ì|Í|Ị|Ỉ|Ĩ", "I");
+        str = str.replaceAll("Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ", "O");
+        str = str.replaceAll("Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ", "U");
+        str = str.replaceAll("Ỳ|Ý|Ỵ|Ỷ|Ỹ", "Y");
+        str = str.replaceAll("Đ", "D");
+        //Đổi khoảng trắng thành ký tự gạch ngang
+        str = str.replaceAll("[\\s]", "-");
+
+        return str.toLowerCase(Locale.ENGLISH);
+    }
+
     @GetMapping("/getAllProduct")
     public ResponseEntity<?> getAllProduct(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy,
                                            @RequestParam String sortType, @RequestParam(defaultValue = "") String search) {
@@ -46,27 +87,63 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/getDetailProduct")
+    public ResponseEntity<?> getDetailProduct(Long id) {
+        try {
+            Product product = productService.getById(id);
+
+            if (product != null) {
+                ProductDetailGetDto result = mapper.map(product, ProductDetailGetDto.class);
+                return responseUtils.getResponseEntity(result, "-1", "Get product success!", HttpStatus.OK);
+            } else {
+                return responseUtils.getResponseEntity("-1", "Get product fail!", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity("-1", "Get product fail!", HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping("/createProduct")
-    public ResponseEntity<?> createProduct(@RequestBody ProductPostDto request, HttpServletRequest HttpRequest) {
+    public ResponseEntity<?> createProduct(@ModelAttribute ProductPostDto request, @ModelAttribute MultipartFile[] files, HttpServletRequest HttpRequest) {
         try {
             if (productService.findByName(request.getName()) != null) {
                 return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (request.getName() == null || request.equals("")) {
+            } else if (request.getName() == null || request.getName().equals("")) {
                 return responseUtils.getResponseEntity("-1", "Product name cant be null!", HttpStatus.BAD_REQUEST);
-            } else if (productService.findByUrl(request.getUrl()) != null) {
-                return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (request.getUrl() == null || request.getUrl().equals("")) {
-                return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
             } else if (request.getPrice().compareTo(BigDecimal.ZERO) < 0) {
                 return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
             } else {
                 Product product = mapper.map(request, Product.class);
-                product.setUrl(Utility.getSiteURL(HttpRequest) + "/product/" + request.getUrl());
+
+                Set<Image> images = new HashSet<>();
+
+                Arrays.stream(files).map(file -> {
+                    try {
+                        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+                        if (extension != null && extension.matches("(png|jpg|jpeg|PNG|JPG|JPEG)")) {
+                            ImageDto imageDto = amazonClient.uploadFile(file);
+                            Image img = new Image();
+                            img.setName(imageDto.getName());
+                            img.setUrl(imageDto.getUrl());
+                            img.setProduct(product);
+
+                            images.add(img);
+                            return "Upload success!";
+                        } else {
+                            return "Upload failer!";
+                        }
+                    } catch (AmazonS3Exception s3) {
+                        return s3.getMessage();
+                    }
+                }).collect(Collectors.toList());
+
+                product.setImages(images);
+                product.setUrl(convert(request.getName()));
                 productService.save(product);
                 return responseUtils.getResponseEntity("1", "Create product success!", HttpStatus.OK);
             }
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Create product fail!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -79,8 +156,8 @@ public class ProductController {
                 return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
             } else if (product.getUrl() == null || product.getUrl().equals("")) {
                 return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-//            } else if (product.getPrice() < 0) {
-//                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
+            } else if (product.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
             } else {
                 Long id = product.getId();
                 Product getProduct = productService.getById(id);

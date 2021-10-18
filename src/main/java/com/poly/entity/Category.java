@@ -9,20 +9,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class Category {
+public class Category extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column
     private String name;
 
-    @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createTime;
-
-    @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modifiedLastTime;
 }

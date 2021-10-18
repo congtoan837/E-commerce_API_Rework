@@ -32,27 +32,35 @@ public class ReviewController {
     private ModelMapper mapper;
 
     @GetMapping("/getAllReview")
-    public ResponseEntity<?> getAllReview(@RequestParam int page) {
+    public ResponseEntity<?> getAllReview(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy,
+                                          @RequestParam String sortType, @RequestParam Long productId) {
         try {
-            Page<Review> reviews = reviewService.findAll(PageRequest.of(page, 5, Sort.by("id").ascending()));
-            Page<ReviewGetDto> result = reviews.map(review -> mapper.map(review, ReviewGetDto.class));
-            return responseUtils.getResponseEntity(result.getContent(), "1", "Get reviews success!", result.getTotalElements(), HttpStatus.OK);
+            String S = sortType.trim().toLowerCase();
+            Page<Review> reviews = reviewService.getReviewByProduct(productId, PageRequest.of(page, size, Sort.by(S.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)));
+            Page<Object> result = reviews.map(review -> mapper.map(review, ReviewGetDto.class));
+            return responseUtils.getResponseEntity(result.getContent(), "1", "Get review success!", reviews.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Get reviews fail!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Get review fail!", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/createReview")
-    public ResponseEntity<?> createUser(@RequestBody Review review, Authentication authentication) {
+    public ResponseEntity<?> createUser(@RequestBody ReviewPostDto request, Authentication authentication) {
         try {
             AuthService auth = (AuthService) authentication.getPrincipal();
             User user = userService.getById(auth.getId());
 
-            if (review.getTitle().length() == 0 || review.getComment().length() == 0) {
+            if (request.getTitle().length() == 0 || request.getComment().length() == 0) {
                 return responseUtils.getResponseEntity("-1", "Create user fail!", HttpStatus.BAD_REQUEST);
-            } else if (review.getRating() <= 0 || review.getRating() > 5) {
+            } else if (request.getRating() <= 0 || request.getRating() > 5) {
                 return responseUtils.getResponseEntity("-1", "Please! rate from 1 to 5 star", HttpStatus.BAD_REQUEST);
             } else {
+                Review review = mapper.map(request, Review.class);
+
+                Product product = new Product();
+                product.setId(request.getProductId());
+
+                review.setProduct(product);
                 review.setUser(user);
                 reviewService.save(review);
                 return responseUtils.getResponseEntity("1", "Create review success!", HttpStatus.OK);
@@ -77,6 +85,7 @@ public class ReviewController {
 
                 if (getReview != null) {
                     if (getReview.getUser().getId().equals(auth.getId())) {
+
                         getReview.setRating(review.getRating());
                         getReview.setTitle(review.getTitle());
                         getReview.setComment(review.getComment());

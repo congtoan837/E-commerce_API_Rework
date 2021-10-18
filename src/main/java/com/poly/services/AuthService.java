@@ -33,6 +33,14 @@ public class AuthService implements UserDetails {
 		return users.getId();
 	}
 
+	public String getName() {
+		return users.getName();
+	}
+
+	public String getImage() {
+		return users.getImage();
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return roles;

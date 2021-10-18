@@ -1,13 +1,11 @@
 package com.poly.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class ProductGetDto {
+public class ProductDetailGetDto {
 
     private Long id;
 
@@ -15,9 +13,13 @@ public class ProductGetDto {
 
     private String url;
 
+    private String shortDescription;
+
     private String price;
 
     private Set<CategoryDto> categories;
 
     private Set<ImageGetDto> images;
+
+    private Set<ReviewGetDto> reviews;
 }

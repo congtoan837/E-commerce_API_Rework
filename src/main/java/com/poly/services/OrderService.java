@@ -5,24 +5,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 public interface OrderService{
-    List<Order> findByUserId(Long userId);
 
-    List<Order> findByOrderStatus(Long orderStatus);
+    List<Order> findByStatus(byte status);
 
-    List<Order> findOrderByUser(String user);
+    Page<Order> getAllOrder(String user, Pageable pageable);
 
-    Order getOne(Long aLong);
+    Order getById(Long id);
 
-    Page<Order> findAll(Pageable pageable);
+    List<Order> findByUserId(UUID userId);
 
-    Order save(Order entity);
-
-    Optional<Order> findById(Long aLong);
-
-    long count();
+    <S extends Order> S save(S entity);
 
     void deleteById(Long aLong);
 }

@@ -12,18 +12,18 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "orders")
-public class Order {
+public class Order extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @Column
-    private String OrderPhone;
+    private String orderPhone;
     @Column
-    private String OrderAddress;
+    private String orderAddress;
     @Column
-    private byte Quantity;
+    private byte quantity;
     @Column
-    private byte Status;
+    private byte status;
     @Column
     private String note;
 
@@ -34,17 +34,7 @@ public class Order {
     private Set<Product> products;
 
     @JsonBackReference(value = "orders_users")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createTime;
-
-    @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modifiedLastTime;
 }

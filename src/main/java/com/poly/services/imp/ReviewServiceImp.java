@@ -7,6 +7,7 @@ import com.poly.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,6 +16,11 @@ import java.util.Optional;
 public class ReviewServiceImp implements ReviewService {
     @Autowired
     ReviewRepository reviewRepository;
+
+    @Override
+    public Page<Review> getReviewByProduct(Long id, Pageable pageable) {
+        return reviewRepository.getReviewByProduct(id, pageable);
+    }
 
     @Override
     public Review getById(long id) {

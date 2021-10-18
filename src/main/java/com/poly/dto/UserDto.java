@@ -2,10 +2,12 @@ package com.poly.dto;
 
 import lombok.Data;
 
-@Data
-public class UserReviewDto {
+import java.util.UUID;
 
-    private Long id;
+@Data
+public class UserDto {
+
+    private UUID id;
 
     private String name;
 
