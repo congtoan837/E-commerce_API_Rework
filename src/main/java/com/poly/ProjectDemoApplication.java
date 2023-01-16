@@ -28,7 +28,7 @@ public class ProjectDemoApplication {
     @PostConstruct
     public void init() {
 
-        List<Role> roleList = (List<Role>) roleService.findAll();
+        List<Role> roleList = roleService.findAll();
         if (roleList.isEmpty()) {
             for (ERole roleName : ERole.values()) {
                 Role role = new Role();
@@ -37,7 +37,7 @@ public class ProjectDemoApplication {
             }
         }
 
-        List<User> users = (List<User>) userService.findAll();
+        List<User> users = userService.findAll();
         if (users.isEmpty()) {
             User user = new User();
             Set<Role> roles = new HashSet<>();

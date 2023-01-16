@@ -6,12 +6,12 @@ import com.poly.entity.JwtResponse;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.JwtUtils;
+import com.poly.ex.ModelMapperConfig;
 import com.poly.ex.Utility;
 import com.poly.services.AuthService;
 import com.poly.services.ResponseUtils;
 import com.poly.services.UserService;
 import net.bytebuddy.utility.RandomString;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +53,7 @@ public class AuthController {
     JwtUtils jwtUtils;
 
     @Autowired
-    private ModelMapper mapper;
+    private ModelMapperConfig mapper;
 
     @Autowired
     private JavaMailSender mailSender;

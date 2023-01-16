@@ -1,4 +1,4 @@
-package com.poly.dto;
+package com.poly.dto.image;
 
 import lombok.Data;
 

@@ -1,15 +1,12 @@
 package com.poly.services;
 
-import com.poly.dto.UserGetDto;
 import com.poly.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -30,5 +27,5 @@ public interface UserService {
 
     void deleteById(UUID uuid);
 
-    Iterable<User> findAll();
+    List<User> findAll();
 }

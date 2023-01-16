@@ -1,10 +1,9 @@
-package com.poly.dto;
+package com.poly.dto.product;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.poly.dto.CategoryDto;
+import com.poly.dto.image.ImageGetDto;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -14,11 +13,9 @@ public class ProductPostDto {
 
     private String name;
 
-    private String url;
-
     private String note;
 
-    private BigDecimal price;
+    private Long price;
 
     private Set<CategoryDto> categories;
 

@@ -22,12 +22,9 @@ public class Product {
     @Column
     private String name;
     @Column
-    private String url;
-    @Column
     private String note;
     @Column
-    @Digits(integer = 20, fraction = 2)
-    private BigDecimal price;
+    private Long price;
     @Column
     private String status;
 

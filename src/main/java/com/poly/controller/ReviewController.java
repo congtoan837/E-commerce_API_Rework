@@ -1,10 +1,13 @@
 package com.poly.controller;
 
-import com.poly.dto.*;
-import com.poly.entity.*;
-import com.poly.services.*;
-
-import org.modelmapper.ModelMapper;
+import com.poly.dto.ReviewGetDto;
+import com.poly.entity.Review;
+import com.poly.entity.User;
+import com.poly.ex.ModelMapperConfig;
+import com.poly.services.AuthService;
+import com.poly.services.ResponseUtils;
+import com.poly.services.ReviewService;
+import com.poly.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +32,7 @@ public class ReviewController {
     UserService userService;
 
     @Autowired
-    private ModelMapper mapper;
+    private ModelMapperConfig mapper;
 
     @GetMapping("/getAllReview")
     public ResponseEntity<?> getAllReview(@RequestParam int page) {

@@ -1,21 +1,19 @@
 package com.poly.controller;
 
-import com.poly.dto.*;
+import com.poly.dto.product.ProductGetDto;
+import com.poly.dto.product.ProductPostDto;
 import com.poly.entity.*;
+import com.poly.ex.ModelMapperConfig;
 import com.poly.services.*;
 
-import com.poly.ex.Utility;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -31,96 +29,70 @@ public class ProductController {
     ResponseUtils responseUtils;
 
     @Autowired
-    private ModelMapper mapper;
+    private ModelMapperConfig mapper;
 
     @GetMapping("/getAllProduct")
-    public ResponseEntity<?> getAllProduct(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy,
-                                           @RequestParam String sortType, @RequestParam(defaultValue = "") String search) {
+    public ResponseEntity<?> getAllProduct(@RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "") String search) {
         try {
-            String S = sortType.trim().toLowerCase();
-            Page<Product> products = productService.getAllProduct(search, PageRequest.of(page, size, Sort.by(S.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)));
-            Page<Object> result = products.map(product -> mapper.map(product, ProductGetDto.class));
-            return responseUtils.getResponseEntity(result.getContent(), "1", "Get product success!", products.getTotalElements(), HttpStatus.OK);
+            Page<Product> products = productService.getAllProduct(search, PageRequest.of(page, size));
+            Page<ProductGetDto> result = mapper.mapEntityPageIntoDtoPage(products, ProductGetDto.class);
+            return responseUtils.getResponseEntity(result.getContent(), "1", "Get product success!", result.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Get product fail!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/createProduct")
-    public ResponseEntity<?> createProduct(@RequestBody ProductPostDto request, HttpServletRequest HttpRequest) {
+    public ResponseEntity<?> createProduct(@RequestBody ProductPostDto request) {
         try {
-            if (productService.findByName(request.getName()) != null) {
-                return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (request.getName() == null || request.equals("")) {
+            if (StringUtils.isBlank(request.getName()))
                 return responseUtils.getResponseEntity("-1", "Product name cant be null!", HttpStatus.BAD_REQUEST);
-            } else if (productService.findByUrl(request.getUrl()) != null) {
-                return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (request.getUrl() == null || request.getUrl().equals("")) {
-                return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-            } else if (request.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+            if (request.getPrice() < 0)
                 return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
-            } else {
-                Product product = mapper.map(request, Product.class);
-                product.setUrl(Utility.getSiteURL(HttpRequest) + "/product/" + request.getUrl());
-                productService.save(product);
-                return responseUtils.getResponseEntity("1", "Create product success!", HttpStatus.OK);
-            }
+            if (productService.findByName(request.getName()) != null)
+                return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
+
+            Product product = productService.save(mapper.map(request, Product.class));
+            return responseUtils.getResponseEntity(product, "1", "Create product success!", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Create product fail!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/updateProduct")
-    public ResponseEntity<?> updateProduct(@RequestBody Product product) {
+    public ResponseEntity<?> updateProduct(@RequestBody ProductPostDto request) {
         try {
-            if (productService.findByName(product.getName()) != null) {
+            if (StringUtils.isBlank(request.getName()))
+                return responseUtils.getResponseEntity("-1", "Product name cant be null!", HttpStatus.BAD_REQUEST);
+            if (request.getPrice() < 0)
+                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
+            if (productService.findByName(request.getName()) != null)
                 return responseUtils.getResponseEntity("-1", "Product name is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (productService.findByUrl(product.getUrl()) != null) {
-                return responseUtils.getResponseEntity("-1", "Product url is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (product.getUrl() == null || product.getUrl().equals("")) {
-                return responseUtils.getResponseEntity("-1", "Product url cant be null!", HttpStatus.BAD_REQUEST);
-//            } else if (product.getPrice() < 0) {
-//                return responseUtils.getResponseEntity("-1", "Product price cant less than 0!", HttpStatus.BAD_REQUEST);
-            } else {
-                Long id = product.getId();
-                Product getProduct = productService.getById(id);
 
-                if (getProduct != null) {
-                    getProduct.setName(product.getName());
-                    getProduct.setUrl(product.getUrl().trim());
-                    getProduct.setNote(product.getNote());
-                    getProduct.setPrice(product.getPrice());
-
-                    if (product.getCategories().size() > 0) {
-                        getProduct.setCategories(product.getCategories());
-                    }
-                    if (product.getImages().size() > 0) {
-                        getProduct.setImages(product.getImages());
-                    }
-
-                    productService.save(getProduct);
-                    return responseUtils.getResponseEntity("1", "Update product success!", HttpStatus.OK);
-                } else {
-                    return responseUtils.getResponseEntity("-1", "Product " + id + " not found!", HttpStatus.BAD_REQUEST);
-                }
+            Product product = productService.getById(request.getId());
+            if (product == null) {
+                return responseUtils.getResponseEntity("-1", "Product not found!", HttpStatus.BAD_REQUEST);
             }
+
+            Product productUpdate = productService.save(mapper.map(request, Product.class));
+            return responseUtils.getResponseEntity(productUpdate, "1", "Update product success!", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Update product fail!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping("/deleteProduct/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+    @DeleteMapping("/deleteProduct")
+    public ResponseEntity<?> deleteProduct(@RequestBody ProductPostDto request) {
         try {
-            Product getProduct = productService.getById(id);
-            if (getProduct == null) {
-                return responseUtils.getResponseEntity("-1", "Product " + id + " not found!", HttpStatus.BAD_REQUEST);
-            } else {
-                productService.deleteById(id);
-                return responseUtils.getResponseEntity("1", "Delete product success!", HttpStatus.OK);
+            Product product = productService.getById(request.getId());
+            if (product == null) {
+                return responseUtils.getResponseEntity("-1", "Product not found!", HttpStatus.BAD_REQUEST);
             }
+
+            productService.deleteById(request.getId());
+            return responseUtils.getResponseEntity("1", "Delete product success!", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Server error!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
 }

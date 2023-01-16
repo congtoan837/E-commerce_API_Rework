@@ -1,11 +1,11 @@
 package com.poly.controller;
 
 import com.poly.dto.CategoryDto;
-import com.poly.dto.UserGetDto;
+import com.poly.dto.user.UserGetDto;
 import com.poly.entity.Category;
+import com.poly.ex.ModelMapperConfig;
 import com.poly.services.CategoryService;
 import com.poly.services.ResponseUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +27,7 @@ public class CategoryController {
     ResponseUtils responseUtils;
 
     @Autowired
-    private ModelMapper mapper;
+    private ModelMapperConfig mapper;
 
     @GetMapping("/getPageCategory")
     public ResponseEntity<?> getPageCategory(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy,

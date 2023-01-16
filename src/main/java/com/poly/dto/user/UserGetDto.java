@@ -1,4 +1,4 @@
-package com.poly.dto;
+package com.poly.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.poly.entity.Role;

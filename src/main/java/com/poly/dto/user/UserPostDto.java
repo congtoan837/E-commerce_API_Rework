@@ -1,4 +1,4 @@
-package com.poly.dto;
+package com.poly.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.poly.entity.Role;
@@ -15,6 +15,8 @@ public class UserPostDto {
     private UUID id;
 
     private String name;
+
+    private String image;
 
     private String email;
 

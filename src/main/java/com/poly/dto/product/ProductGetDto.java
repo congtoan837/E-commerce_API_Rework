@@ -1,9 +1,10 @@
-package com.poly.dto;
+package com.poly.dto.product;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.poly.dto.CategoryDto;
+import com.poly.dto.image.ImageGetDto;
+import com.poly.dto.ReviewGetDto;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
