@@ -48,7 +48,7 @@ public class ProjectDemoApplication {
             roles.add(roleAdmin);
 
             user.setUsername("admin");
-            user.setPassword("$2a$10$mCGfUjNS3bbojpVORiFw7OxhMBvVXCoueBcnWsD7ALCkQ1WsHfahy");
+            user.setPassword("$2a$10$mCGfUjNS3bbojpVORiFw7OxhMBvVXCoueBcnWsD7ALCkQ1WsHfahy"); //12345678
             user.setRoles(roles);
             userService.save(user);
         }
