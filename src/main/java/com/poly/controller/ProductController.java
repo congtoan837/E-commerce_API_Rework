@@ -32,7 +32,7 @@ public class ProductController {
     private ModelMapperConfig mapper;
 
     @GetMapping("/getAllProduct")
-    public ResponseEntity<?> getAllProduct(@RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "") String search) {
+    public ResponseEntity<?> getAllProduct(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "") String search) {
         try {
             Page<Product> products = productService.getAllProduct(search, PageRequest.of(page, size));
             Page<ProductGetDto> result = mapper.mapEntityPageIntoDtoPage(products, ProductGetDto.class);

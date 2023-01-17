@@ -14,8 +14,6 @@ public interface ProductService {
 
     Product findByName(String name);
 
-    Product findByUrl(String url);
-
     Product getById(Long id);
 
     List<Product> findAll();

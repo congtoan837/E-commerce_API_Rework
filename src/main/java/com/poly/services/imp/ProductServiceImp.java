@@ -30,11 +30,6 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public Product findByUrl(String url) {
-        return productRepository.findByUrl(url);
-    }
-
-    @Override
     public Product getById(Long id) {
         return productRepository.getById(id);
     }

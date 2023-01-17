@@ -24,10 +24,10 @@ public class OrderController {
     ResponseUtils responseUtils;
 
     @GetMapping("/getAllOrder")
-    public ResponseEntity<?> getAllOrder(@RequestParam int page, Authentication authentication) {
+    public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size, Authentication authentication) {
         try {
             if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-                Page<Order> orders = orderService.findAll(PageRequest.of(page, 5, Sort.by("id").ascending()));
+                Page<Order> orders = orderService.findAll(PageRequest.of(page, size, Sort.by("id").ascending()));
                 return responseUtils.getResponseEntity(orders, "1", "Get order success!", HttpStatus.OK);
             } else {
                 return responseUtils.getResponseEntity("-1", "You not have permission to access!", HttpStatus.BAD_REQUEST);

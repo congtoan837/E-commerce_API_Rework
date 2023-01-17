@@ -2,7 +2,7 @@ package com.poly.dto.product;
 
 import com.poly.dto.CategoryDto;
 import com.poly.dto.image.ImageGetDto;
-import com.poly.dto.ReviewGetDto;
+import com.poly.dto.review.ReviewGetDto;
 import lombok.Data;
 
 import java.util.Set;

@@ -30,7 +30,7 @@ public class CategoryController {
     private ModelMapperConfig mapper;
 
     @GetMapping("/getPageCategory")
-    public ResponseEntity<?> getPageCategory(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy,
+    public ResponseEntity<?> getPageCategory(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size, @RequestParam String sortBy,
                                             @RequestParam String sortType, @RequestParam(defaultValue = "") String search) {
         try {
             String S = sortType.trim().toLowerCase();
@@ -38,7 +38,7 @@ public class CategoryController {
             Page<Object> result = categories.map(category -> mapper.map(category, UserGetDto.class));
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get category success!", categories.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Get category fail!", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
 

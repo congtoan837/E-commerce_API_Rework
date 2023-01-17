@@ -1,11 +1,12 @@
-package com.poly.dto;
+package com.poly.dto.review;
 
+import com.poly.dto.UserReviewDto;
 import lombok.Data;
 
 @Data
 public class ReviewGetDto {
 
-    private Integer id;
+    private Long id;
 
     private int rating;
 
