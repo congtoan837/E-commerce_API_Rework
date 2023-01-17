@@ -75,8 +75,10 @@ public class UsersController {
             request.setPassword(passwordEncoder.encode(request.getPassword()));
             if (StringUtils.isBlank(request.getImage()))
                 request.setImage(StringContent.avatar_default);
-            if (request.getRoles().size() == 0)
-                request.setRoles(Role.builder().build());
+            if (request.getRoles().size() == 0) {
+                Role roleUser = Role.builder().id(3L).build();
+                request.getRoles().add(roleUser);
+            }
             // save
             User user = userService.save(mapper.map(request, User.class));
             return responseUtils.getResponseEntity(user, "1", "Create user success!", HttpStatus.OK);
