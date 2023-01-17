@@ -38,6 +38,7 @@ public class CategoryController {
             Page<Object> result = categories.map(category -> mapper.map(category, UserGetDto.class));
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get category success!", categories.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }

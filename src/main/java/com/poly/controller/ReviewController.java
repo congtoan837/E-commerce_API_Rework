@@ -101,6 +101,7 @@ public class ReviewController {
             reviewService.save(mapper.map(request, Review.class));
             return responseUtils.getResponseEntity("1", "Update review success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }

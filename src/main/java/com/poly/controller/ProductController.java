@@ -38,6 +38,7 @@ public class ProductController {
             Page<ProductGetDto> result = mapper.mapEntityPageIntoDtoPage(products, ProductGetDto.class);
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get product success!", result.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -55,6 +56,7 @@ public class ProductController {
             Product product = productService.save(mapper.map(request, Product.class));
             return responseUtils.getResponseEntity(product, "1", "Create product success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -77,6 +79,7 @@ public class ProductController {
             Product productUpdate = productService.save(mapper.map(request, Product.class));
             return responseUtils.getResponseEntity(productUpdate, "1", "Update product success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -92,6 +95,7 @@ public class ProductController {
             productService.deleteById(request.getId());
             return responseUtils.getResponseEntity("1", "Delete product success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }

@@ -44,6 +44,7 @@ public class LoggingService {
             data.append("\nLOGGING RESPONSE-----------------------------------\n")
                 .append("[REQUEST-ID]: ").append(requestId).append("\n")
                 .append("[RESPONSE-CODE]: ").append(httpServletResponse.getStatus()).append("\n")
+//                .append("[ERROR-MESSAGE: ").append(httpServletResponse.getOutputStream()).append("\n")
                 .append("LOGGING RESPONSE-----------------------------------\n");
             log.info(data.toString());
         }catch (Exception e) {

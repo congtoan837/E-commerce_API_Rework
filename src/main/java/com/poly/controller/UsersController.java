@@ -54,6 +54,7 @@ public class UsersController {
             Page<UserGetDto> result = mapper.mapEntityPageIntoDtoPage(users, UserGetDto.class);
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get user success!", users.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -78,6 +79,7 @@ public class UsersController {
             User user = userService.save(mapper.map(request, User.class));
             return responseUtils.getResponseEntity(user, "1", "Create user success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -101,6 +103,7 @@ public class UsersController {
             userService.save(mapper.map(request, User.class));
             return responseUtils.getResponseEntity("1", "Update user success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -116,6 +119,7 @@ public class UsersController {
             userService.deleteById(request.getId());
             return responseUtils.getResponseEntity("1", "Delete user success!", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
