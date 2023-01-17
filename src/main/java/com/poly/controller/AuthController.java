@@ -120,15 +120,14 @@ public class AuthController {
     public ResponseEntity<?> verifyAccount(@RequestParam("code") String code) {
         try {
             User user = userService.getByVerifyCode(code);
-            if (!user.isEnabled()) {
-                userService.findByVerifyCodeAndEnable(code);
-                user.setVerifyCode(null);
-                return responseUtils.getResponseEntity(HttpStatus.OK);
-            } else {
-                return responseUtils.getResponseEntity(HttpStatus.BAD_REQUEST);
+            if (user.isEnabled()) {
+                return responseUtils.getResponseEntity("-1", "Verified account!", HttpStatus.BAD_REQUEST);
             }
+
+            userService.findByVerifyCodeAndEnable(code);
+            return responseUtils.getResponseEntity("1", "Verify success!", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity(HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
         }
     }
 
