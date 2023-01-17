@@ -3,6 +3,7 @@ package com.poly.controller;
 import com.poly.dto.image.*;
 import com.poly.dto.product.ProductGetDto;
 import com.poly.dto.user.*;
+import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.AmazonClient;
 import com.poly.ex.ModelMapperConfig;
@@ -72,9 +73,10 @@ public class UsersController {
                 return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
             // default
             request.setPassword(passwordEncoder.encode(request.getPassword()));
-            if (StringUtils.isBlank(request.getImage())) {
+            if (StringUtils.isBlank(request.getImage()))
                 request.setImage(StringContent.avatar_default);
-            }
+            if (request.getRoles().size() == 0)
+                request.setRoles(Role.builder().build());
             // save
             User user = userService.save(mapper.map(request, User.class));
             return responseUtils.getResponseEntity(user, "1", "Create user success!", HttpStatus.OK);

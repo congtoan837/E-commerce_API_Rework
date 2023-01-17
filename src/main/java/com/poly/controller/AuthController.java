@@ -7,6 +7,7 @@ import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.JwtUtils;
 import com.poly.ex.ModelMapperConfig;
+import com.poly.ex.StringContent;
 import com.poly.ex.Utility;
 import com.poly.services.AuthService;
 import com.poly.services.ResponseUtils;
@@ -24,12 +25,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,29 +40,22 @@ import java.util.stream.Collectors;
 @RestController
 public class AuthController {
 
-    @Autowired
-    ResponseUtils responseUtils;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
-
-    @Autowired
-    private ModelMapperConfig mapper;
-
-    @Autowired
-    private JavaMailSender mailSender;
-
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    @Autowired
+    ResponseUtils responseUtils;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    UserService userService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    JwtUtils jwtUtils;
+    @Autowired
+    private ModelMapperConfig mapper;
+    @Autowired
+    private JavaMailSender mailSender;
 
     public static boolean validate(String emailStr) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
@@ -87,39 +82,35 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request, HttpServletRequest servletRequest) {
         try {
-            if (userService.getByUsername(request.getUsername()) != null) {
+            if (userService.getByUsername(request.getUsername()) != null)
                 return responseUtils.getResponseEntity(null, "-1", "Username is already exists!", HttpStatus.BAD_REQUEST);
-            } else if (request.getUsername().length() < 6) {
+            if (request.getUsername().length() < 6)
                 return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            } else if (request.getPassword().length() < 6) {
+            if (request.getPassword().length() < 6)
                 return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            } else if (!validate(request.getEmail())){
+            if (!validate(request.getEmail()))
                 return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
-            } else {
-                User user = mapper.map(request, User.class);
-                user.setPassword(passwordEncoder.encode(request.getPassword()));
-                user.setVerifyCode(RandomString.make(64));
 
-                Set<Role> roles = new HashSet<>();
-                Role role = new Role();
-                role.setId(3L);
-                roles.add(role);
-
-                user.setRoles(roles);
-                if (user.getImage() == null) {
-                    user.setImage("https://congtoan-bucket.s3.ap-southeast-1.amazonaws.com/1630749704358-avatar.png");
-                }
-                User response = userService.save(user);
-
-                String siteURL = Utility.getSiteURL(servletRequest);
-
-                try {
-                    sendVerificationEmail(request, response, siteURL);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-                return responseUtils.getResponseEntity("1", "Create user success!", HttpStatus.OK);
+            User user = mapper.map(request, User.class);
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setVerifyCode(RandomString.make(64));
+            // role
+            Role roleUser = Role.builder().id(3L).build();
+            user.getRoles().add(roleUser);
+            // image
+            if (user.getImage() == null) {
+                user.setImage(StringContent.avatar_default);
             }
+            User response = userService.save(user);
+
+            String siteURL = Utility.getSiteURL(servletRequest);
+            // send code
+            try {
+                sendVerificationEmail(request, response, siteURL);
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+            return responseUtils.getResponseEntity("1", "Create user success!", HttpStatus.OK);
         } catch (Exception e) {
             return responseUtils.getResponseEntity(null, "-1", "Create user fail!", HttpStatus.BAD_REQUEST);
         }
