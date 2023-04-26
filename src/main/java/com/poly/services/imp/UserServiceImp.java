@@ -41,8 +41,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public Page<User> getAllUser(String user, Pageable pageable) {
-        return userRepository.getAllUser(user, pageable);
+    public Page<User> getUserByNameOrUsername(String keyword, Pageable pageable) {
+        return userRepository.getUserByNameOrUsername(keyword, pageable);
     }
 
     @Override

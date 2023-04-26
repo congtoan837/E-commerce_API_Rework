@@ -17,13 +17,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 	User getByUsername(String username);
 
-	@Query("SELECT u FROM User AS u WHERE " +
-			"u.name LIKE %:user% OR " +
-			"u.email LIKE %:user% OR " +
-			"u.phone LIKE %:user% OR " +
-			"u.address LIKE %:user% OR " +
-			"u.username LIKE %:user%")
-	Page<User> getAllUser(String user, Pageable pageable);
+	Page<User> findByNameContainingOrUsernameContaining(String keyword, Pageable pageable);
+
+	default Page<User> getUserByNameOrUsername(String keyword, Pageable pageable) {
+		if (keyword == null || keyword.isEmpty()) {
+			return findAll(pageable);
+		}
+		return findByNameContainingOrUsernameContaining(keyword, pageable);
+	}
 
 	User getByVerifyCode(String verifyCode);
 

@@ -21,7 +21,7 @@ public interface UserService {
     @Transactional
     void findByVerifyCodeAndEnable(String code);
 
-    Page<User> getAllUser(String user, Pageable pageable);
+    Page<User> getUserByNameOrUsername(String keyword, Pageable pageable);
 
     <S extends User> S save(S entity);
 

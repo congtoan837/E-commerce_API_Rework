@@ -49,9 +49,9 @@ public class UsersController {
     }
 
     @GetMapping("/getAllUser")
-    public ResponseEntity<?> getAllUser(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size, @RequestParam(defaultValue = "") String search) {
+    public ResponseEntity<?> getAllUser(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "") String search) {
         try {
-            Page<User> users = userService.getAllUser(search, PageRequest.of(page, size));
+            Page<User> users = userService.getUserByNameOrUsername(search, PageRequest.of(page, size));
             Page<UserGetDto> result = mapper.mapEntityPageIntoDtoPage(users, UserGetDto.class);
             return responseUtils.getResponseEntity(result.getContent(), "1", "Get user success!", users.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
