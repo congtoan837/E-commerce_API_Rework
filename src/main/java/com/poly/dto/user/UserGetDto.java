@@ -1,7 +1,6 @@
 package com.poly.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.poly.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +27,7 @@ public class UserGetDto {
 
     private String username;
 
-    private Set<Role> roles;
+    private String Role;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createTime;

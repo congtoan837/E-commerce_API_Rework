@@ -18,7 +18,7 @@ public class BucketController {
     private AmazonClient amazonClient;
 
     @PostMapping("/uploadFile")
-    public ImageDto uploadFile(@ModelAttribute User user ,@ModelAttribute MultipartFile file) {
+    public ImageDto uploadFile(@ModelAttribute User user , @ModelAttribute MultipartFile file) {
         return amazonClient.uploadFile(file);
     }
 }

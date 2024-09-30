@@ -1,7 +1,6 @@
 package com.poly.dto.product;
 
 import com.poly.dto.CategoryDto;
-import com.poly.dto.image.ImageGetDto;
 import lombok.Data;
 
 import java.util.Set;
@@ -19,5 +18,7 @@ public class ProductPostDto {
 
     private Set<CategoryDto> categories;
 
-    private Set<ImageGetDto> images;
+    private String cover_image;
+
+    private Set<String> images;
 }

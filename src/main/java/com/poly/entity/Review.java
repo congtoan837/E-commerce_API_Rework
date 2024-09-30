@@ -1,31 +1,34 @@
 package com.poly.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
-@Table(name="reviews")
+@Builder
+@Table
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
     @Column
     private int rating;
-
     @Column
-    @NotNull
     private String title;
-
-    @NotNull
     @Column
     private String comment;
 

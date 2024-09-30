@@ -11,13 +11,5 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    @Query("SELECT c FROM Category AS c WHERE c.name LIKE %:name%")
-    Page<Category> pageSearchCategory(String name, Pageable pageable);
 
-    @Query("SELECT c FROM Category AS c WHERE c.name LIKE %:name%")
-    List<Category> searchCategory(String name);
-
-    Category findByName(String name);
-
-    Category getById(Long id);
 }

@@ -10,7 +10,7 @@ import com.poly.ex.ModelMapperConfig;
 import com.poly.ex.StringContent;
 import com.poly.ex.Utility;
 import com.poly.services.AuthService;
-import com.poly.services.ResponseUtils;
+import com.poly.exception.ResponseUtils;
 import com.poly.services.UserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,83 +80,68 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request, HttpServletRequest servletRequest) {
-        try {
-            if (userService.getByUsername(request.getUsername()) != null)
-                return responseUtils.getResponseEntity(null, "-1", "Username is already exists!", HttpStatus.BAD_REQUEST);
-            if (request.getUsername().length() < 6)
-                return responseUtils.getResponseEntity(null, "-1", "Username must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            if (request.getPassword().length() < 6)
-                return responseUtils.getResponseEntity(null, "-1", "Password must be at least 6 characters!", HttpStatus.BAD_REQUEST);
-            if (!validate(request.getEmail()))
-                return responseUtils.getResponseEntity(null, "-1", "Email is not in the correct formatting!", HttpStatus.BAD_REQUEST);
+    public Object signup(@RequestBody SignupRequest request, HttpServletRequest servletRequest) throws Exception {
+        if (request.getUsername().length() < 6)
+            throw new Exception("");
+        if (request.getPassword().length() < 6)
+            throw new Exception("");
+        if (!validate(request.getEmail()))
+            throw new Exception("");
 
-            User user = mapper.map(request, User.class);
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setVerifyCode(RandomString.make(64));
-            // role
-            Role roleUser = Role.builder().id(3L).build();
-            user.getRoles().add(roleUser);
-            // image
-            if (user.getImage() == null) {
-                user.setImage(StringContent.avatar_default);
-            }
-            User response = userService.save(user);
+        if (userService.getByUsername(request.getUsername()) != null)
+            return new ResponseEntity<>(null, "Username is already exists!", HttpStatus.BAD_REQUEST);
 
-            String siteURL = Utility.getSiteURL(servletRequest);
-            // send code
-            try {
-                sendVerificationEmail(request, response, siteURL);
-            } catch (Exception e) {
-                e.getStackTrace();
-            }
-            return responseUtils.getResponseEntity("1", "Create user success!", HttpStatus.OK);
-        } catch (Exception e) {
-            return responseUtils.getResponseEntity(null, "-1", "Create user fail!", HttpStatus.BAD_REQUEST);
+        User user = mapper.map(request, User.class);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setVerifyCode(RandomString.make(64));
+        // role
+        Role roleUser = Role.builder().id(3L).build();
+        user.getRoles().add(roleUser);
+        // image
+        if (user.getImage() == null) {
+            user.setImage(StringContent.avatar_default);
         }
+        User response = userService.save(user);
+
+//        String siteURL = Utility.getSiteURL(servletRequest);
+//        // send code
+//        try {
+//            sendVerificationEmail(request, response, siteURL);
+//        } catch (Exception e) {
+//            e.getStackTrace();
+//        }
+        return response;
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<?> verifyAccount(@RequestParam("code") String code) {
-        try {
-            User user = userService.getByVerifyCode(code);
-            if (user.isEnabled()) {
-                return responseUtils.getResponseEntity("-1", "Verified account!", HttpStatus.BAD_REQUEST);
-            }
-
-            userService.findByVerifyCodeAndEnable(code);
-            return responseUtils.getResponseEntity("1", "Verify success!", HttpStatus.OK);
-        } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    private void sendVerificationEmail(SignupRequest request, User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-        String subject = "Kích hoạt tài khoản của bạn";
-        String senderMail = "congtoan837@gmail.com";
-        String senderName = "E-Commerce";
-        String mailContent = "<p>Xin chào " + request.getName() + ",</p>";
-        mailContent += "<p>Để kích hoạt tài khoản, bạn vui lòng nhấp vào link dưới đây:</p>";
-        mailContent += "<p>" + siteURL + "/verify?code=" + user.getVerifyCode() + "</p>";
-        mailContent += "<p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
-
-        message.setContent(mailContent, "text/html; charset=utf-8");
-
-        helper.setTo(request.getEmail());
-        helper.setFrom(senderMail, senderName);
-        helper.setSubject(subject);
-
-        this.mailSender.send(message);
-    }
-
-    private ResponseEntity<?> getResponseEntity(Object data, String mess, HttpStatus status) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("Data", data);
-        response.put("Status", status);
-        response.put("Messenger", mess);
-        return new ResponseEntity<>(response, status);
-    }
+//    @GetMapping("/verify")
+//    public Object verifyAccount(@RequestParam("code") String code) {
+//        User user = userService.getByVerifyCode(code);
+//        if (user.isEnabled()) {
+//            return true;
+//        }
+//
+//        userService.findByVerifyCodeAndEnable(code);
+//        return new ResponseEntity<>(null, "Verify success!", HttpStatus.OK);
+//    }
+//
+//    private void sendVerificationEmail(SignupRequest request, User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
+//        MimeMessage message = mailSender.createMimeMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+//
+//        String subject = "Kích hoạt tài khoản của bạn";
+//        String senderMail = "congtoan837@gmail.com";
+//        String senderName = "E-Commerce";
+//        String mailContent = "<p>Xin chào " + request.getName() + ",</p>";
+//        mailContent += "<p>Để kích hoạt tài khoản, bạn vui lòng nhấp vào link dưới đây:</p>";
+//        mailContent += "<p>" + siteURL + "/verify?code=" + user.getVerifyCode() + "</p>";
+//        mailContent += "<p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
+//
+//        message.setContent(mailContent, "text/html; charset=utf-8");
+//
+//        helper.setTo(request.getEmail());
+//        helper.setFrom(senderMail, senderName);
+//        helper.setSubject(subject);
+//
+//        this.mailSender.send(message);
+//    }
 }

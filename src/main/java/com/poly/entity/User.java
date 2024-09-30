@@ -1,11 +1,13 @@
 package com.poly.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.UserDetailsManagerConfigurer;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,7 +17,8 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "users")
+@Builder
+@Table
 public class User implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -69,4 +72,6 @@ public class User implements Serializable {
     @Column(name = "ModifiedLastTime")
 //	@Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime modifiedLastTime;
+
+
 }

@@ -13,22 +13,5 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-	User getById(UUID id);
 
-	User getByUsername(String username);
-
-	@Query("SELECT u FROM User AS u WHERE " +
-			"u.name LIKE %:user% OR " +
-			"u.email LIKE %:user% OR " +
-			"u.phone LIKE %:user% OR " +
-			"u.address LIKE %:user% OR " +
-			"u.username LIKE %:user%")
-	Page<User> getAllUser(String user, Pageable pageable);
-
-	User getByVerifyCode(String verifyCode);
-
-	@Transactional
-	@Modifying
-	@Query("UPDATE User u SET u.enabled = true WHERE u.verifyCode = :code")
-	void findByVerifyCodeAndEnable(String code);
 }

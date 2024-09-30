@@ -1,6 +1,7 @@
 package com.poly.controller;
 
 import com.poly.entity.*;
+import com.poly.exception.ResponseUtils;
 import com.poly.services.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,12 @@ public class OrderController {
         try {
             if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
                 Page<Order> orders = orderService.findAll(PageRequest.of(page, size, Sort.by("id").ascending()));
-                return responseUtils.getResponseEntity(orders, "1", "Get order success!", HttpStatus.OK);
+                return new ResponseEntity<>(orders, "Get order success!", HttpStatus.OK);
             } else {
-                return responseUtils.getResponseEntity("-1", "You not have permission to access!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(null, "You not have permission to access!", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            return responseUtils.getResponseEntity(null, "-1", "Get order fail!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, "Get order fail!", HttpStatus.BAD_REQUEST);
         }
     }
 }

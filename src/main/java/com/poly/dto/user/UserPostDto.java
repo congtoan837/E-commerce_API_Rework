@@ -1,13 +1,8 @@
 package com.poly.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.poly.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -27,5 +22,5 @@ public class UserPostDto {
 
     private String password;
 
-    private Set<Role> roles = new HashSet<>();
+    private String Role;
 }

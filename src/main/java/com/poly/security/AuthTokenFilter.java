@@ -1,7 +1,10 @@
 package com.poly.security;
 
+import com.poly.entity.User;
 import com.poly.ex.JwtUtils;
-import com.poly.services.imp.AuthServiceImp;
+import com.poly.repositories.UserRepository;
+import com.poly.services.AuthService;
+import com.poly.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +24,11 @@ import java.io.IOException;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
-	private JwtUtils jwtUtils;
-
+	JwtUtils jwtUtils;
 	@Autowired
-	private AuthServiceImp authServiceImp;;
+	UserService userService;
+	@Autowired
+	AuthService authService;
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
@@ -35,8 +39,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			String jwt = parseJwt(request);
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 				String username = jwtUtils.getUserNameFromJwtToken(jwt);
-
-				UserDetails userDetails = authServiceImp.loadUserByUsername(username);
+				UserDetails userDetails = authService.build(userService.getByUsername(username));
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

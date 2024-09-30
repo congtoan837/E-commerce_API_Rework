@@ -4,8 +4,9 @@ import com.poly.dto.CategoryDto;
 import com.poly.dto.user.UserGetDto;
 import com.poly.entity.Category;
 import com.poly.ex.ModelMapperConfig;
+import com.poly.ex.StringContent;
 import com.poly.services.CategoryService;
-import com.poly.services.ResponseUtils;
+import com.poly.exception.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,34 +23,33 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     CategoryService categoryService;
-
     @Autowired
     ResponseUtils responseUtils;
 
     @Autowired
-    private ModelMapperConfig mapper;
+    ModelMapperConfig mapper;
 
     @GetMapping("/getPageCategory")
     public ResponseEntity<?> getPageCategory(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "1") int size, @RequestParam String sortBy,
-                                            @RequestParam String sortType, @RequestParam(defaultValue = "") String search) {
+                                             @RequestParam(defaultValue = "1") int sortType, @RequestParam(defaultValue = "") String search) {
         try {
-            String S = sortType.trim().toLowerCase();
-            Page<Category> categories = categoryService.pageSearchCategory(search, PageRequest.of(page, size, Sort.by(S.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)));
+            Sort.Direction StringSort = (sortType == 1) ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Page<Category> categories = categoryService.pageSearchCategory(search, PageRequest.of(page, size, Sort.by(StringSort, sortBy)));
             Page<Object> result = categories.map(category -> mapper.map(category, UserGetDto.class));
-            return responseUtils.getResponseEntity(result.getContent(), "1", "Get category success!", categories.getTotalElements(), HttpStatus.OK);
+            return new ResponseEntity<>(result.getContent(), StringContent.SUCCESS, categories.getTotalElements(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return responseUtils.getResponseEntity("-1", "Error processing!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, StringContent.FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/getListCategory")
-    public ResponseEntity<?> getListCategory(@RequestParam(defaultValue = "") String search) {
+    public ResponseEntity<?> countCategory(@RequestParam(defaultValue = "") String search) {
         try {
             List<Category> categoryList = categoryService.SearchCategory(search);
-            return responseUtils.getResponseEntity(categoryList, "1", "Get category success!", HttpStatus.OK);
+            return new ResponseEntity<>(categoryList, StringContent.SUCCESS, HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Get category fail!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, StringContent.FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -57,16 +57,16 @@ public class CategoryController {
     public ResponseEntity<?> createCategory(@RequestBody CategoryDto request) {
         try {
             if (categoryService.findByName(request.getName()) != null) {
-                return responseUtils.getResponseEntity("-1", "Category name is already exists!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(null, "Category name is already exists!", HttpStatus.BAD_REQUEST);
             } else if (request.getName().length() < 3) {
-                return responseUtils.getResponseEntity("-1", "Category must be at least 3 characters!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(null, "Category must be at least 3 characters!", HttpStatus.BAD_REQUEST);
             } else {
                 Category category = mapper.map(request, Category.class);
                 categoryService.save(category);
-                return responseUtils.getResponseEntity("-1", "Create category success!", HttpStatus.OK);
+                return new ResponseEntity<>(null, StringContent.SUCCESS, HttpStatus.OK);
             }
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Create category fail!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, StringContent.FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -74,7 +74,7 @@ public class CategoryController {
     public ResponseEntity<?> updateCategory(@RequestBody CategoryDto request) {
         try {
             if (request.getName().length() < 3) {
-                return responseUtils.getResponseEntity("-1", "Category must be at least 3 characters!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Category must be at least 3 characters!", HttpStatus.BAD_REQUEST);
             } else {
                 Long id = request.getId();
                 Category category = categoryService.getById(id);
@@ -82,13 +82,13 @@ public class CategoryController {
                 if (category != null) {
                     category.setName(request.getName());
                     categoryService.save(category);
-                    return responseUtils.getResponseEntity("-1", "Update category success!", HttpStatus.OK);
+                    return new ResponseEntity<>(StringContent.SUCCESS, HttpStatus.OK);
                 } else {
-                    return responseUtils.getResponseEntity("-1", "Category not found!", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(StringContent.FAIL, HttpStatus.BAD_REQUEST);
                 }
             }
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Update category fail!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, StringContent.FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -96,15 +96,14 @@ public class CategoryController {
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         try {
             Category category = categoryService.getById(id);
-
             if (category != null) {
                 categoryService.deleteById(id);
-                return responseUtils.getResponseEntity("-1", "Delete category success!", HttpStatus.OK);
-            } else {
-                return responseUtils.getResponseEntity("-1", "Category not found!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(StringContent.SUCCESS, HttpStatus.OK);
             }
+
+            return new ResponseEntity<>(StringContent.NOT_FOUND, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity("-1", "Server error!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(StringContent.FAIL, HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -7,16 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
-public interface ReviewService {
-    Review getById(long id);
+public class ReviewService {
 
-    Page<Review> findAll(Pageable pageable);
-
-    Review save(Review entity);
-
-    Optional<Review> findById(Long aLong);
-
-    long count();
-
-    void deleteById(Long aLong);
 }
