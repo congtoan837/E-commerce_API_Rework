@@ -1,24 +1,22 @@
 package com.poly.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.Digits;
-import java.math.BigDecimal;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
-@Table
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -26,7 +24,7 @@ public class Product {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private UUID id;
     @Column
     private String name;
@@ -38,27 +36,27 @@ public class Product {
     private String status;
     @Column
     private String cover_image;
-    @Column
+    @ElementCollection
     private Set<String> images;
+    @Column
+    private boolean isDeleted;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(name = "products_categories",
-            joinColumns = {@JoinColumn(name = "product_id")},
-            inverseJoinColumns = {@JoinColumn(name = "category_id")})
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     private Set<Category> categories;
 
-    @JsonManagedReference(value = "reviews_products")
+    @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
     private Set<Review> reviews;
 
     @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column
     private LocalDateTime modifiedLastTime;
 }

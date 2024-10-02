@@ -1,4 +1,4 @@
-package com.poly.dto.user;
+package com.poly.dto.Response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class UserGetDto {
+public class UserResponse {
     private UUID id;
 
     private String name;
@@ -27,7 +27,7 @@ public class UserGetDto {
 
     private String username;
 
-    private String Role;
+    private Set<String> roles;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createTime;

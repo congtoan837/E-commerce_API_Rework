@@ -1,21 +1,24 @@
 package com.poly.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
-@Table
+@Table(name = "reviews")
 public class Review {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -23,7 +26,7 @@ public class Review {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private UUID id;
     @Column
     private int rating;
@@ -31,24 +34,24 @@ public class Review {
     private String title;
     @Column
     private String comment;
+    @Column
+    private boolean isDeleted;
 
-    @JsonBackReference(value="reviews_products")
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Product product;
 
-    @JsonBackReference(value="reviews_users")
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
     @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column
     private LocalDateTime modifiedLastTime;
 }

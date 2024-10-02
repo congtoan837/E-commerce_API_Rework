@@ -1,116 +1,82 @@
 package com.poly.controller;
 
-import com.poly.dto.LoginRequest;
-import com.poly.dto.SignupRequest;
-import com.poly.entity.JwtResponse;
-import com.poly.entity.Role;
+import com.poly.dto.Request.LoginRequest;
+import com.poly.dto.Request.UserRequest;
+import com.poly.dto.Response.ApiResponse;
+import com.poly.dto.Response.JwtResponse;
+import com.poly.dto.Response.UserResponse;
 import com.poly.entity.User;
-import com.poly.ex.JwtUtils;
+import com.poly.ex.ERole;
 import com.poly.ex.ModelMapperConfig;
 import com.poly.ex.StringContent;
-import com.poly.ex.Utility;
+import com.poly.exception.AppException;
+import com.poly.exception.ErrorCode;
+import com.poly.exception.GlobalException;
 import com.poly.services.AuthService;
-import com.poly.exception.ResponseUtils;
 import com.poly.services.UserService;
-import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import io.micrometer.common.util.StringUtils;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
-
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    @Autowired
-    ResponseUtils responseUtils;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    UserService userService;
-    @Autowired
+
     PasswordEncoder passwordEncoder;
-    @Autowired
-    JwtUtils jwtUtils;
-    @Autowired
-    private ModelMapperConfig mapper;
-    @Autowired
-    private JavaMailSender mailSender;
+    AuthService authService;
+    UserService userService;
+    ModelMapperConfig mapper;
 
     public static boolean validate(String emailStr) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
         return matcher.find();
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
-            AuthService userDetails = (AuthService) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-                    .collect(Collectors.toList());
-            return getResponseEntity(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles), "Login success!", HttpStatus.OK);
-        } catch (Exception e) {
-            return getResponseEntity(null, "Login fail!", HttpStatus.BAD_REQUEST);
-        }
+    @PostMapping("/login")
+    public ApiResponse<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        JwtResponse response = authService.authenticate(loginRequest);
+        return GlobalException.AppResponse(response);
     }
 
     @PostMapping("/signup")
-    public Object signup(@RequestBody SignupRequest request, HttpServletRequest servletRequest) throws Exception {
+    public ApiResponse<?> signup(@RequestBody UserRequest request) {
         if (request.getUsername().length() < 6)
-            throw new Exception("");
+            throw new AppException(ErrorCode.USERNAME_SHORT);
         if (request.getPassword().length() < 6)
-            throw new Exception("");
+            throw new AppException(ErrorCode.PASSWORD_SHORT);
         if (!validate(request.getEmail()))
-            throw new Exception("");
+            throw new AppException(ErrorCode.EMAIL_REGEX);
 
-        if (userService.getByUsername(request.getUsername()) != null)
-            return new ResponseEntity<>(null, "Username is already exists!", HttpStatus.BAD_REQUEST);
+        if (userService.getByUsername(request.getUsername()).isPresent())
+            throw new AppException(ErrorCode.USERNAME_EXITS);
 
-        User user = mapper.map(request, User.class);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setVerifyCode(RandomString.make(64));
-        // role
-        Role roleUser = Role.builder().id(3L).build();
-        user.getRoles().add(roleUser);
-        // image
-        if (user.getImage() == null) {
-            user.setImage(StringContent.avatar_default);
-        }
-        User response = userService.save(user);
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .image(StringUtils.isNotBlank(request.getImage()) ? request.getImage() : StringContent.avatar_default)
+                .roles(Collections.singleton(ERole.USER.name()))
+                .build();
 
-//        String siteURL = Utility.getSiteURL(servletRequest);
-//        // send code
-//        try {
-//            sendVerificationEmail(request, response, siteURL);
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//        }
-        return response;
+        UserResponse response = mapper.map(userService.save(user), UserResponse.class);
+
+        return GlobalException.AppResponse(response);
     }
 
 //    @GetMapping("/verify")

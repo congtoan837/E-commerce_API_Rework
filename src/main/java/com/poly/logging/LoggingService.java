@@ -1,11 +1,10 @@
 package com.poly.logging;
 
 import com.poly.ex.IPClient;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Service
 @Slf4j
@@ -24,7 +23,7 @@ public class LoggingService {
                 .append("[IPClient]: ").append(IPClient.getClientIp(httpServletRequest)).append("\n")
                 .append("[SESSION]: ").append(httpServletRequest.getSession().getId()).append("\n")
                 .append("[BODY REQUEST]: ").append("\n\n")
-//                .append(GsonParserUtils.parseObjectToString(body))
+                .append(GsonParserUtils.parseObjectToString(body))
                 .append("\n\n")
                 .append("LOGGING REQUEST BODY-----------------------------------\n");
             log.info(data.toString());

@@ -1,26 +1,27 @@
 package com.poly.ex;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.poly.dto.image.ImageDto;
+import com.poly.dto.Response.ImageResponse;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 
 @Service
 public class AmazonClient {
 
-    private AmazonS3 s3client;
+    private S3Client s3client;
 
     @Value("${endpointUrl}")
     private String endpointUrl;
@@ -30,11 +31,16 @@ public class AmazonClient {
     private String accessKey;
     @Value("${secretKey}")
     private String secretKey;
+    @Value("${region}")
+    private String region;
 
     @PostConstruct
     public void initializeAmazon() {
-        AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
-        this.s3client = new AmazonS3Client(credentials);
+        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKey, secretKey);
+        this.s3client = S3Client.builder()
+                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
+                .region(Region.of(region))
+                .build();
     }
 
     public String generateFileName(MultipartFile multiPart) {
@@ -49,11 +55,10 @@ public class AmazonClient {
         return convFile;
     }
 
-    public ImageDto uploadFile(MultipartFile multipartFile) {
+    public ImageResponse uploadFile(MultipartFile multipartFile) {
 
-        ImageDto imgDto = new ImageDto();
+        ImageResponse imgDto = new ImageResponse();
         try {
-
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile);
             imgDto.setName(fileName);
@@ -61,13 +66,22 @@ public class AmazonClient {
             uploadFileTos3bucket(fileName, file);
             file.delete();
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace(); // Bạn có thể log lỗi ở đây
         }
         return imgDto;
     }
 
     public void uploadFileTos3bucket(String fileName, File file) {
-        s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        try {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .acl("public-read")
+                    .build();
+
+            s3client.putObject(putObjectRequest, Paths.get(file.getAbsolutePath()));
+        } catch (S3Exception e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+        }
     }
 }

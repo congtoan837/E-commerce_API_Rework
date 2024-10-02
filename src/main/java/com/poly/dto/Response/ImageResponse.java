@@ -1,9 +1,9 @@
-package com.poly.dto.image;
+package com.poly.dto.Response;
 
 import lombok.Data;
 
 @Data
-public class ImageDto {
+public class ImageResponse {
     public String name;
     public String url;
 }

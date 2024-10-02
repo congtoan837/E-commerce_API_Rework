@@ -1,4 +1,4 @@
-package com.poly.dto;
+package com.poly.dto.Request;
 
 import lombok.Data;
 

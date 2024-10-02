@@ -1,13 +1,11 @@
-package com.poly.dto.product;
+package com.poly.dto.Response;
 
-import com.poly.dto.CategoryDto;
-import com.poly.dto.review.ReviewGetDto;
 import lombok.Data;
 
 import java.util.Set;
 
 @Data
-public class ProductGetDto {
+public class ProductResponse {
 
     private Long id;
 
@@ -19,11 +17,11 @@ public class ProductGetDto {
 
     private String price;
 
-    private Set<CategoryDto> categories;
+    private Set<CategoryResponse> categories;
 
     private String cover_image;
 
     private Set<String> images;
 
-    private Set<ReviewGetDto> reviews;
+    private Set<ReviewResponse> reviews;
 }

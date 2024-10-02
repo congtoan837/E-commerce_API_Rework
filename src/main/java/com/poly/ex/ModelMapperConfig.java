@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Configuration
 public class ModelMapperConfig extends ModelMapper {
     @Bean
@@ -19,7 +22,10 @@ public class ModelMapperConfig extends ModelMapper {
         return modelMapper;
     }
 
-    public <D, T> Page<D> mapEntityPageIntoDtoPage(Page<T> entities, Class<D> dtoClass) {
-        return entities.map(objectEntity -> modelMapper().map(objectEntity, dtoClass));
+    // Phương thức chung để map từ danh sách source sang target class
+    public <T, U> List<U> mapList(List<T> sourceList, Class<U> targetClass) {
+        return sourceList.stream()
+                .map(element -> modelMapper().map(element, targetClass))
+                .collect(Collectors.toList());
     }
 }

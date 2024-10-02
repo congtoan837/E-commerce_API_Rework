@@ -1,6 +1,6 @@
 package com.poly.ex;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class Utility {
     public static String getSiteURL(HttpServletRequest request) {

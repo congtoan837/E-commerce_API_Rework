@@ -1,10 +1,9 @@
-package com.poly.dto.review;
+package com.poly.dto.Request;
 
-import com.poly.dto.UserReviewDto;
 import lombok.Data;
 
 @Data
-public class ReviewPostDto {
+public class ReviewRequest {
 
     private Long id;
 

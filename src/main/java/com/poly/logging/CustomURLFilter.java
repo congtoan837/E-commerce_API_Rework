@@ -1,9 +1,13 @@
 package com.poly.logging;
 
 import lombok.extern.slf4j.Slf4j;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.UUID;
@@ -15,21 +19,31 @@ public class CustomURLFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+        // Có thể thêm logic khởi tạo nếu cần thiết
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+            throws IOException, ServletException {
+        try {
+            // Tạo request ID ngẫu nhiên
+            String requestId = UUID.randomUUID().toString();
+            servletRequest.setAttribute(REQUEST_ID, requestId);
 
-        String requestId = UUID.randomUUID().toString();
-        servletRequest.setAttribute(REQUEST_ID, requestId);
-        logRequest((HttpServletRequest) servletRequest, requestId);
-        filterChain.doFilter(servletRequest, servletResponse);
+            // Ghi log thông tin request
+            logRequest((HttpServletRequest) servletRequest, requestId);
+
+            // Tiếp tục chuỗi filter
+            filterChain.doFilter(servletRequest, servletResponse);
+        } catch (Exception e) {
+            log.error("Exception occurred while filtering request", e);
+            throw e;
+        }
     }
 
     @Override
     public void destroy() {
-
+        // Có thể thêm logic dọn dẹp tài nguyên nếu cần
     }
 
     private void logRequest(HttpServletRequest request, String requestId) {
@@ -37,19 +51,20 @@ public class CustomURLFilter implements Filter {
             StringBuilder data = new StringBuilder();
             data.append("\nLOGGING REQUEST-----------------------------------\n")
                     .append("[REQUEST-ID]: ").append(requestId).append("\n")
-                    .append("[USERNAME]: ").append(request.getRemoteUser()).append("\n")
+                    .append("[USERNAME]: ").append(request.getRemoteUser() != null ? request.getRemoteUser() : "Anonymous").append("\n")
                     .append("[PATH]: ").append(request.getRequestURI()).append("\n")
-                    .append("[QUERIES]: ").append(request.getQueryString()).append("\n")
+                    .append("[QUERIES]: ").append(request.getQueryString() != null ? request.getQueryString() : "No query").append("\n")
                     .append("[HEADERS]: ").append("\n");
 
-            Enumeration headerNames = request.getHeaderNames();
+            // Duyệt qua tất cả các header của request
+            Enumeration<String> headerNames = request.getHeaderNames();
             while (headerNames.hasMoreElements()) {
-                String key = (String) headerNames.nextElement();
+                String key = headerNames.nextElement();
                 String value = request.getHeader(key);
                 data.append("---").append(key).append(" : ").append(value).append("\n");
             }
-            data.append("LOGGING REQUEST-----------------------------------\n");
 
+            data.append("LOGGING REQUEST-----------------------------------\n");
             log.info(data.toString());
         }
     }

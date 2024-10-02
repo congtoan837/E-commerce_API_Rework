@@ -1,6 +1,6 @@
-package com.poly.dto.product;
+package com.poly.dto.Request;
 
-import com.poly.dto.CategoryDto;
+import com.poly.dto.Response.CategoryResponse;
 import lombok.Data;
 
 import java.util.Set;
@@ -16,7 +16,7 @@ public class ProductPostDto {
 
     private Long price;
 
-    private Set<CategoryDto> categories;
+    private Set<CategoryResponse> categories;
 
     private String cover_image;
 

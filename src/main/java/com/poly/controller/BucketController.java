@@ -1,6 +1,6 @@
 package com.poly.controller;
 
-import com.poly.dto.image.ImageDto;
+import com.poly.dto.Response.ImageResponse;
 import com.poly.entity.User;
 import com.poly.ex.AmazonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class BucketController {
     private AmazonClient amazonClient;
 
     @PostMapping("/uploadFile")
-    public ImageDto uploadFile(@ModelAttribute User user , @ModelAttribute MultipartFile file) {
+    public ImageResponse uploadFile(@ModelAttribute User user, @ModelAttribute MultipartFile file) {
         return amazonClient.uploadFile(file);
     }
 }

@@ -1,21 +1,25 @@
 package com.poly.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
-@Table
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -23,7 +27,7 @@ public class Order {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private UUID id;
     @Column
     private String OrderPhone;
@@ -35,25 +39,26 @@ public class Order {
     private byte Status;
     @Column
     private String note;
+    @Column
+    private boolean isDeleted;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "orders_products",
-            joinColumns = {@JoinColumn(name = "order_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
     private Set<Product> products;
 
-    @JsonBackReference(value = "orders_users")
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
     @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column
     private LocalDateTime modifiedLastTime;
 }

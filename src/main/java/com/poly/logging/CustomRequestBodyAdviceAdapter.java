@@ -1,5 +1,9 @@
 package com.poly.logging;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
@@ -8,16 +12,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 
 @ControllerAdvice
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
-
-    @Autowired
     LoggingService loggingService;
-
-    @Autowired
     HttpServletRequest httpServletRequest;
 
     @Override

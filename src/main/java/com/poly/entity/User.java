@@ -1,24 +1,26 @@
 package com.poly.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.UserDetailsManagerConfigurer;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
-@Table
+@Table(name = "users")
 public class User implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -26,51 +28,45 @@ public class User implements Serializable {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private UUID id;
-    @Column(name = "Name")
+    @Column
     private String name;
-    @Column(name = "Email")
+    @Column
     private String email;
-    @Column(name = "Phone")
+    @Column
     private String phone;
-    @Column(name = "Address")
+    @Column
     private String address;
-    @Column(name = "Image")
+    @Column
     private String image;
-    @Column(name = "Status")
+    @Column
     private boolean enabled;
-    @Column(name = "Username")
+    @Column
     private String username;
-    @Column(name = "Password")
+    @Column
     private String password;
-    @Column(name = "verifyCode")
-    private String verifyCode;
+    @Column
+    private int verifyCode;
+    @Column
+    private boolean isDeleted;
+    @ElementCollection
+    private Set<String> roles;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private Set<Role> roles;
-
-    @JsonManagedReference(value="orders_users")
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
     private Set<Order> orders;
 
-    @JsonManagedReference(value = "reviews_users")
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
     private Set<Review> reviews;
 
     @CreationTimestamp
-    @Column(name = "CreateTime", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column(name = "ModifiedLastTime")
-//	@Temporal(TemporalType.TIMESTAMP)
+    @Column
     private LocalDateTime modifiedLastTime;
 
 

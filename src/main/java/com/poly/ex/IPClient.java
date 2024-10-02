@@ -1,6 +1,7 @@
 package com.poly.ex;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.StringTokenizer;
 
 public class IPClient {

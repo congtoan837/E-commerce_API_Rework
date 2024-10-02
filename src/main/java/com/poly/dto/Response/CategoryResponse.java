@@ -1,9 +1,9 @@
-package com.poly.dto;
+package com.poly.dto.Response;
 
 import lombok.Data;
 
 @Data
-public class CategoryDto {
+public class CategoryResponse {
 
     private Long id;
 

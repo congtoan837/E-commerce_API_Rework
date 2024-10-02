@@ -1,72 +1,68 @@
 package com.poly.services;
 
-import com.poly.entity.Role;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.poly.dto.Request.LoginRequest;
+import com.poly.dto.Response.JwtResponse;
 import com.poly.entity.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.poly.exception.AppException;
+import com.poly.exception.ErrorCode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
-public class AuthService implements UserDetails {
+@Service
+public class AuthService {
+    @Value("${signerKey}")
+    protected String SIGNER_KEY;
+    @Autowired
+    UserService userService;
 
-	private User users;
+    public JwtResponse authenticate(LoginRequest request) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-	private Collection<? extends GrantedAuthority> roles;
+        User user = userService.getByUsername(request.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-	public AuthService(User user, Collection<? extends GrantedAuthority> roles) {
-		super();
-		this.users = user;
-		this.roles = roles;
-	}
+        boolean isAuthenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!isAuthenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-	public static AuthService build(User user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
-				new SimpleGrantedAuthority(role.getName().name())
-		).collect(Collectors.toList());
+        String token = generateJwtToken(request.getUsername());
 
-		return new AuthService(user, authorities);
-	}
+        return JwtResponse.builder()
+                .token(token)
+                .build();
+    }
 
-	public UUID getId() {
-		return users.getId();
-	}
+    public String generateJwtToken(String username) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return roles;
-	}
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(username)
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                ))
+                .build();
 
-	@Override
-	public String getPassword() {
-		return users.getPassword();
-	}
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
-	@Override
-	public String getUsername() {
-		return users.getUsername();
-	}
+        JWSObject jwsObject = new JWSObject(header, payload);
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
+    }
 
 }
