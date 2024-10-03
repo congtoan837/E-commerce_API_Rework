@@ -50,8 +50,13 @@ public class User implements Serializable {
     private int verifyCode;
     @Column
     private boolean isDeleted;
-    @ElementCollection
-    private Set<String> roles;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_name")
+    )
+    private Set<Role> roles;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -62,12 +67,10 @@ public class User implements Serializable {
     private Set<Review> reviews;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column
+    @Column(nullable = false)
     private LocalDateTime modifiedLastTime;
-
-
 }

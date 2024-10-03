@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 public class AuthService {
@@ -34,22 +36,23 @@ public class AuthService {
         boolean isAuthenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!isAuthenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        String token = generateJwtToken(request.getUsername());
+        String token = generateJwtToken(user);
 
         return JwtResponse.builder()
                 .token(token)
                 .build();
     }
 
-    public String generateJwtToken(String username) {
+    public String generateJwtToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(user.getUsername())
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
+                .claim("scope", buildScope(user))
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -62,7 +65,13 @@ public class AuthService {
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    private String buildScope(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
+        }
+        return stringJoiner.toString();
+    }
 }

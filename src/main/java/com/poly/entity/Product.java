@@ -53,10 +53,10 @@ public class Product {
     private Set<Review> reviews;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column
+    @Column(nullable = false)
     private LocalDateTime modifiedLastTime;
 }

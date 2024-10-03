@@ -55,10 +55,10 @@ public class Order {
     private User user;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createTime;
 
     @UpdateTimestamp
-    @Column
+    @Column(nullable = false)
     private LocalDateTime modifiedLastTime;
 }

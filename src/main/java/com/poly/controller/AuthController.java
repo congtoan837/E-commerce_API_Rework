@@ -5,6 +5,7 @@ import com.poly.dto.Request.UserRequest;
 import com.poly.dto.Response.ApiResponse;
 import com.poly.dto.Response.JwtResponse;
 import com.poly.dto.Response.UserResponse;
+import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.ERole;
 import com.poly.ex.ModelMapperConfig;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,22 +64,10 @@ public class AuthController {
         if (!validate(request.getEmail()))
             throw new AppException(ErrorCode.EMAIL_REGEX);
 
-        if (userService.getByUsername(request.getUsername()).isPresent())
-            throw new AppException(ErrorCode.USERNAME_EXITS);
+        if (userService.existsByUsername(request.getUsername()))
+            throw new AppException(ErrorCode.USERNAME_EXISTS);
 
-        User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .address(request.getAddress())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .image(StringUtils.isNotBlank(request.getImage()) ? request.getImage() : StringContent.avatar_default)
-                .roles(Collections.singleton(ERole.USER.name()))
-                .build();
-
-        UserResponse response = mapper.map(userService.save(user), UserResponse.class);
-
-        return GlobalException.AppResponse(response);
+        return GlobalException.AppResponse(userService.create(request));
     }
 
 //    @GetMapping("/verify")
