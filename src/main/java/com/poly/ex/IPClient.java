@@ -1,11 +1,11 @@
 package com.poly.ex;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.StringTokenizer;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public class IPClient {
-    public static String getClientIp(HttpServletRequest request){
+    public static String getClientIp(HttpServletRequest request) {
         String xForwardedForHeader = request.getHeader("X-Forwarded-For");
         if (xForwardedForHeader == null) {
             return request.getRemoteAddr();

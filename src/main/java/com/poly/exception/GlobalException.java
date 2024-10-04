@@ -1,12 +1,12 @@
 package com.poly.exception;
 
-import com.poly.dto.Response.ApiResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.poly.dto.Response.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalException {
@@ -34,7 +34,8 @@ public class GlobalException {
                 .code(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
                 .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
                 .build();
-        return ResponseEntity.status(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode()).body(apiResponse);
+        return ResponseEntity.status(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode())
+                .body(apiResponse);
     }
 
     @ExceptionHandler(value = AppException.class)

@@ -18,24 +18,25 @@ public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
     LoggingService loggingService;
 
     @Override
-    public boolean supports(MethodParameter methodParameter,
-                            Class<? extends HttpMessageConverter<?>> aClass) {
+    public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
         return true;
     }
 
     @Override
-    public Object beforeBodyWrite(Object o,
-                                  MethodParameter methodParameter,
-                                  MediaType mediaType,
-                                  Class<? extends HttpMessageConverter<?>> aClass,
-                                  ServerHttpRequest serverHttpRequest,
-                                  ServerHttpResponse serverHttpResponse) {
+    public Object beforeBodyWrite(
+            Object o,
+            MethodParameter methodParameter,
+            MediaType mediaType,
+            Class<? extends HttpMessageConverter<?>> aClass,
+            ServerHttpRequest serverHttpRequest,
+            ServerHttpResponse serverHttpResponse) {
 
-        if (serverHttpRequest instanceof ServletServerHttpRequest &&
-                serverHttpResponse instanceof ServletServerHttpResponse) {
+        if (serverHttpRequest instanceof ServletServerHttpRequest
+                && serverHttpResponse instanceof ServletServerHttpResponse) {
             loggingService.logResponse(
                     ((ServletServerHttpRequest) serverHttpRequest).getServletRequest(),
-                    ((ServletServerHttpResponse) serverHttpResponse).getServletResponse(), o);
+                    ((ServletServerHttpResponse) serverHttpResponse).getServletResponse(),
+                    o);
         }
 
         return o;

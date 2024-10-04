@@ -1,12 +1,13 @@
 package com.poly.mapper;
 
-import com.poly.dto.Request.PermissionRequest;
-import com.poly.dto.Response.PermissionResponse;
-import com.poly.entity.Permission;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
+import com.poly.dto.Request.PermissionRequest;
+import com.poly.dto.Response.PermissionResponse;
+import com.poly.entity.Permission;
 
 @Mapper(componentModel = "spring")
 public interface PermissionMapper {

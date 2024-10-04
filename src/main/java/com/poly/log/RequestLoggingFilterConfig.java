@@ -10,8 +10,7 @@ public class RequestLoggingFilterConfig {
 
     @Bean
     public CommonsRequestLoggingFilter logFilter() {
-        CommonsRequestLoggingFilter filter
-                = new CommonsRequestLoggingFilter();
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
         filter.setIncludeQueryString(true);
         filter.setIncludePayload(true);
         filter.setMaxPayloadLength(10000);
@@ -21,12 +20,12 @@ public class RequestLoggingFilterConfig {
     }
 
     @Bean
-    public FilterRegistrationBean < CustomURLFilter > filterRegistrationBean() {
-        FilterRegistrationBean < CustomURLFilter > registrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<CustomURLFilter> filterRegistrationBean() {
+        FilterRegistrationBean<CustomURLFilter> registrationBean = new FilterRegistrationBean();
         CustomURLFilter customURLFilter = new CustomURLFilter();
 
         registrationBean.setFilter(customURLFilter);
-        registrationBean.setOrder(2); //set precedence
+        registrationBean.setOrder(2); // set precedence
         return registrationBean;
     }
 }

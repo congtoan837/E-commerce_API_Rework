@@ -1,27 +1,30 @@
 package com.poly.controller;
 
-import com.poly.dto.Request.LoginRequest;
-import com.poly.dto.Request.UserRequest;
-import com.poly.dto.Response.ApiResponse;
-import com.poly.dto.Response.JwtResponse;
-import com.poly.Config.ModelMapperConfig;
-import com.poly.exception.AppException;
-import com.poly.exception.ErrorCode;
-import com.poly.exception.GlobalException;
-import com.poly.services.AuthService;
-import com.poly.services.UserService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.poly.Config.ModelMapperConfig;
+import com.poly.dto.Request.LoginRequest;
+import com.poly.dto.Request.UserRequest;
+import com.poly.dto.Response.ApiResponse;
+import com.poly.dto.Response.JwtResponse;
+import com.poly.exception.AppException;
+import com.poly.exception.ErrorCode;
+import com.poly.exception.GlobalException;
+import com.poly.services.AuthService;
+import com.poly.services.UserService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -49,41 +52,41 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ApiResponse<?> signup(@RequestBody @Valid UserRequest request) {
-        if (userService.existsByUsername(request.getUsername()))
-            throw new AppException(ErrorCode.USERNAME_EXISTS);
+        if (userService.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USERNAME_EXISTS);
 
         return GlobalException.AppResponse(userService.create(request));
     }
 
-//    @GetMapping("/verify")
-//    public Object verifyAccount(@RequestParam("code") String code) {
-//        User user = userService.getByVerifyCode(code);
-//        if (user.isEnabled()) {
-//            return true;
-//        }
-//
-//        userService.findByVerifyCodeAndEnable(code);
-//        return new ResponseEntity<>(null, "Verify success!", HttpStatus.OK);
-//    }
-//
-//    private void sendVerificationEmail(SignupRequest request, User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-//
-//        String subject = "Kích hoạt tài khoản của bạn";
-//        String senderMail = "congtoan837@gmail.com";
-//        String senderName = "E-Commerce";
-//        String mailContent = "<p>Xin chào " + request.getName() + ",</p>";
-//        mailContent += "<p>Để kích hoạt tài khoản, bạn vui lòng nhấp vào link dưới đây:</p>";
-//        mailContent += "<p>" + siteURL + "/verify?code=" + user.getVerifyCode() + "</p>";
-//        mailContent += "<p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
-//
-//        message.setContent(mailContent, "text/html; charset=utf-8");
-//
-//        helper.setTo(request.getEmail());
-//        helper.setFrom(senderMail, senderName);
-//        helper.setSubject(subject);
-//
-//        this.mailSender.send(message);
-//    }
+    //    @GetMapping("/verify")
+    //    public Object verifyAccount(@RequestParam("code") String code) {
+    //        User user = userService.getByVerifyCode(code);
+    //        if (user.isEnabled()) {
+    //            return true;
+    //        }
+    //
+    //        userService.findByVerifyCodeAndEnable(code);
+    //        return new ResponseEntity<>(null, "Verify success!", HttpStatus.OK);
+    //    }
+    //
+    //    private void sendVerificationEmail(SignupRequest request, User user, String siteURL) throws
+    // MessagingException, UnsupportedEncodingException {
+    //        MimeMessage message = mailSender.createMimeMessage();
+    //        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    //
+    //        String subject = "Kích hoạt tài khoản của bạn";
+    //        String senderMail = "congtoan837@gmail.com";
+    //        String senderName = "E-Commerce";
+    //        String mailContent = "<p>Xin chào " + request.getName() + ",</p>";
+    //        mailContent += "<p>Để kích hoạt tài khoản, bạn vui lòng nhấp vào link dưới đây:</p>";
+    //        mailContent += "<p>" + siteURL + "/verify?code=" + user.getVerifyCode() + "</p>";
+    //        mailContent += "<p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
+    //
+    //        message.setContent(mailContent, "text/html; charset=utf-8");
+    //
+    //        helper.setTo(request.getEmail());
+    //        helper.setFrom(senderMail, senderName);
+    //        helper.setSubject(subject);
+    //
+    //        this.mailSender.send(message);
+    //    }
 }

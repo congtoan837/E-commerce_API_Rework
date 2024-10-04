@@ -1,5 +1,17 @@
 package com.poly.controller;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import jakarta.validation.Valid;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
 import com.poly.dto.Request.PermissionRequest;
 import com.poly.dto.Request.RoleRequest;
 import com.poly.dto.Request.UserRequest;
@@ -18,23 +30,11 @@ import com.poly.mapper.UserMapper;
 import com.poly.services.PermissionService;
 import com.poly.services.RoleService;
 import com.poly.services.UserService;
+
 import io.micrometer.common.util.StringUtils;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -64,25 +64,25 @@ public class AdminController {
     public ApiResponse<?> getInfo(Authentication authentication) {
         String userId = ((Jwt) authentication.getPrincipal()).getClaimAsString("userId");
 
-        User user = userService.getById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userService.getById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return GlobalException.AppResponse(userMapper.toUserResponse(user));
     }
 
     @GetMapping("/user/get")
-    public ApiResponse getAllUser(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
+    public ApiResponse getAllUser(
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
         List<UserResponse> responses = userService.getAll(page, size);
         return GlobalException.AppResponse(responses);
     }
 
     @PostMapping("/user/create")
     public ApiResponse<?> createUser(@RequestBody @Valid UserRequest request) {
-        if (userService.existsByUsername(request.getUsername()))
-            throw new AppException(ErrorCode.USERNAME_EXISTS);
+        if (userService.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USERNAME_EXISTS);
         // encode password
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         // set default avatar if not input
-        request.setImage(StringUtils.isNotBlank(request.getImage()) ? request.getImage() : StringContent.avatar_default);
+        request.setImage(
+                StringUtils.isNotBlank(request.getImage()) ? request.getImage() : StringContent.avatar_default);
 
         return GlobalException.AppResponse(userService.create(request));
     }
@@ -92,8 +92,7 @@ public class AdminController {
         if (StringUtils.isNotBlank(request.getPassword()))
             request.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        User user = userService.getById(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userService.getById(request.getId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         // map những field không null từ request
         userMapper.updateUserFromUserRequest(user, request);
@@ -119,8 +118,8 @@ public class AdminController {
 
     @PutMapping("/permission/update")
     public ApiResponse<?> updatePermission(@RequestBody PermissionRequest request) {
-        Permission permission = permissionService.getById(request.getName())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+        Permission permission =
+                permissionService.getById(request.getName()).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
 
         // map những field không null từ request
         permissionMapper.updatePermissionFromPermissionRequest(permission, request);
@@ -146,8 +145,7 @@ public class AdminController {
 
     @PutMapping("/role/update")
     public ApiResponse<?> updateRole(@RequestBody RoleRequest request) {
-        Role role = roleService.getById(request.getName())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+        Role role = roleService.getById(request.getName()).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
 
         // map những field không null từ request
         roleMapper.updateRoleFromRoleRequest(role, request);

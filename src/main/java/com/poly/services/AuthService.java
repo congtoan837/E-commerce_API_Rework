@@ -1,5 +1,17 @@
 package com.poly.services;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.StringJoiner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -8,29 +20,20 @@ import com.poly.dto.Response.JwtResponse;
 import com.poly.entity.User;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
 
 @Service
 public class AuthService {
     @Value("${signerKey}")
     protected String SIGNER_KEY;
+
     @Autowired
     UserService userService;
 
     public JwtResponse authenticate(LoginRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        User user = userService.getByUsername(request.getUsername())
+        User user = userService
+                .getByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         boolean isAuthenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -38,9 +41,7 @@ public class AuthService {
 
         String token = generateJwtToken(user);
 
-        return JwtResponse.builder()
-                .token(token)
-                .build();
+        return JwtResponse.builder().token(token).build();
     }
 
     public String generateJwtToken(User user) {
@@ -49,9 +50,7 @@ public class AuthService {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
-                ))
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .claim("userId", user.getId())
                 .claim("scope", buildScope(user))
                 .build();

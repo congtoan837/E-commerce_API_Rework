@@ -1,6 +1,9 @@
 package com.poly.log;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.UUID;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -8,9 +11,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CustomURLFilter implements Filter {
@@ -50,11 +52,20 @@ public class CustomURLFilter implements Filter {
         if (request != null) {
             StringBuilder data = new StringBuilder();
             data.append("\nLOGGING REQUEST-----------------------------------\n")
-                    .append("[REQUEST-ID]: ").append(requestId).append("\n")
-                    .append("[USERNAME]: ").append(request.getRemoteUser() != null ? request.getRemoteUser() : "Anonymous").append("\n")
-                    .append("[PATH]: ").append(request.getRequestURI()).append("\n")
-                    .append("[QUERIES]: ").append(request.getQueryString() != null ? request.getQueryString() : "No query").append("\n")
-                    .append("[HEADERS]: ").append("\n");
+                    .append("[REQUEST-ID]: ")
+                    .append(requestId)
+                    .append("\n")
+                    .append("[USERNAME]: ")
+                    .append(request.getRemoteUser() != null ? request.getRemoteUser() : "Anonymous")
+                    .append("\n")
+                    .append("[PATH]: ")
+                    .append(request.getRequestURI())
+                    .append("\n")
+                    .append("[QUERIES]: ")
+                    .append(request.getQueryString() != null ? request.getQueryString() : "No query")
+                    .append("\n")
+                    .append("[HEADERS]: ")
+                    .append("\n");
 
             // Duyệt qua tất cả các header của request
             Enumeration<String> headerNames = request.getHeaderNames();

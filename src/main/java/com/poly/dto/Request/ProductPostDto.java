@@ -1,11 +1,11 @@
 package com.poly.dto.Request;
 
+import java.util.Set;
+
 import com.poly.dto.Response.CategoryResponse;
-import lombok.Data;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Set;
 
 @Getter
 @Setter

@@ -1,10 +1,10 @@
 package com.poly.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
@@ -22,8 +22,7 @@ public enum ErrorCode {
     INPUT_VALID(-1, "Input invalid", HttpStatus.BAD_REQUEST),
     EMAIL_INVALID(-1, "Email invalid", HttpStatus.BAD_REQUEST),
     NOT_FOUND(-1, "Not found", HttpStatus.BAD_REQUEST),
-
-;
+    ;
     private int code;
     private String message;
     private HttpStatusCode statusCode;

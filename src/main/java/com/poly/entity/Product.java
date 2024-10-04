@@ -1,15 +1,18 @@
 package com.poly.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.*;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
+
+import jakarta.persistence.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -20,32 +23,33 @@ import java.util.UUID;
 public class Product {
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(updatable = false, nullable = false)
     private UUID id;
+
     @Column
     private String name;
+
     @Column
     private String note;
+
     @Column
     private Long price;
+
     @Column
     private String status;
+
     @Column
     private String cover_image;
+
     @ElementCollection
     private Set<String> images;
+
     @Column
     private boolean isDeleted;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
+    @JoinTable(joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories;
 
     @JsonManagedReference

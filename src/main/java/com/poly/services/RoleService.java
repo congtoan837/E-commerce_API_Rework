@@ -1,5 +1,13 @@
 package com.poly.services;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.poly.dto.Request.RoleRequest;
 import com.poly.dto.Response.RoleResponse;
 import com.poly.entity.Permission;
@@ -7,16 +15,10 @@ import com.poly.entity.Role;
 import com.poly.mapper.RoleMapper;
 import com.poly.repositories.PermissionRepository;
 import com.poly.repositories.RoleRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

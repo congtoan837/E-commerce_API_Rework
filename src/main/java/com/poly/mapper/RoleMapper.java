@@ -1,13 +1,14 @@
 package com.poly.mapper;
 
-import com.poly.dto.Request.RoleRequest;
-import com.poly.dto.Response.RoleResponse;
-import com.poly.entity.Role;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
+import com.poly.dto.Request.RoleRequest;
+import com.poly.dto.Response.RoleResponse;
+import com.poly.entity.Role;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper {

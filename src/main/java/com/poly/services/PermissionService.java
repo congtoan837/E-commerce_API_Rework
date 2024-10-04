@@ -1,21 +1,21 @@
 package com.poly.services;
 
-import com.poly.dto.Request.PermissionRequest;
-import com.poly.dto.Response.PermissionResponse;
-import com.poly.entity.Permission;
-import com.poly.exception.AppException;
-import com.poly.exception.ErrorCode;
-import com.poly.mapper.PermissionMapper;
-import com.poly.repositories.PermissionRepository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.poly.dto.Request.PermissionRequest;
+import com.poly.dto.Response.PermissionResponse;
+import com.poly.entity.Permission;
+import com.poly.mapper.PermissionMapper;
+import com.poly.repositories.PermissionRepository;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,8 @@ public class PermissionService {
 
     public List<PermissionResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return permissionMapper.toPermissionResponseList(permissionRepository.findAll(pageable).getContent());
+        return permissionMapper.toPermissionResponseList(
+                permissionRepository.findAll(pageable).getContent());
     }
 
     public void delete(String Id) {

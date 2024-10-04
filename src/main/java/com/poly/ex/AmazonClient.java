@@ -1,22 +1,25 @@
 package com.poly.ex;
 
-import com.poly.dto.Response.ImageResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Date;
+
 import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.poly.dto.Response.ImageResponse;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Date;
 
 @Service
 public class AmazonClient {
@@ -25,12 +28,16 @@ public class AmazonClient {
 
     @Value("${endpointUrl}")
     private String endpointUrl;
+
     @Value("${bucketName}")
     private String bucketName;
+
     @Value("${accessKey}")
     private String accessKey;
+
     @Value("${secretKey}")
     private String secretKey;
+
     @Value("${region}")
     private String region;
 

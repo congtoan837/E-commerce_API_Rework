@@ -1,14 +1,14 @@
 package com.poly.repositories;
 
-import com.poly.entity.Permission;
-import com.poly.entity.User;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.poly.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {

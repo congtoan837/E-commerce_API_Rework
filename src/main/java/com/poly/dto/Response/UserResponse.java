@@ -1,9 +1,8 @@
 package com.poly.dto.Response;
 
-import lombok.*;
-
 import java.util.Set;
-import java.util.UUID;
+
+import lombok.*;
 
 @Data
 @Builder

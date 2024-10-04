@@ -1,8 +1,13 @@
 package com.poly.services;
 
+import java.util.*;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.poly.dto.Request.UserRequest;
 import com.poly.dto.Response.UserResponse;
-import com.poly.entity.Permission;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.exception.AppException;
@@ -10,14 +15,10 @@ import com.poly.exception.ErrorCode;
 import com.poly.mapper.UserMapper;
 import com.poly.repositories.RoleRepository;
 import com.poly.repositories.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,8 @@ public class UserService {
 
     public List<UserResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return userMapper.toUserResponseList(userRepository.findByIsDeletedFalse(pageable).getContent());
+        return userMapper.toUserResponseList(
+                userRepository.findByIsDeletedFalse(pageable).getContent());
     }
 
     public Optional<User> getById(UUID id) {
@@ -59,8 +61,8 @@ public class UserService {
     }
 
     public void delete(UUID Id) {
-        User user = userRepository.findByIdAndIsDeletedFalse(Id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+        User user =
+                userRepository.findByIdAndIsDeletedFalse(Id).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
         user.setDeleted(true);
 
         userRepository.save(user);

@@ -1,60 +1,67 @@
 package com.poly.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poly.dto.Response.ApiResponse;
-import com.poly.exception.ErrorCode;
+import java.io.IOException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poly.dto.Response.ApiResponse;
+import com.poly.exception.ErrorCode;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint, AccessDeniedHandler {
 
-	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, IOException {
-		response.setContentType("application/json");
-		response.setStatus(ErrorCode.UNAUTHENTICATED.getStatusCode().value());
+    @Override
+    public void commence(
+            HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException, IOException {
+        response.setContentType("application/json");
+        response.setStatus(ErrorCode.UNAUTHENTICATED.getStatusCode().value());
 
-		ApiResponse<?> apiResponse = ApiResponse.builder()
-				.code(ErrorCode.UNAUTHENTICATED.getCode())
-				.message(ErrorCode.UNAUTHENTICATED.getMessage())
-				.build();
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(ErrorCode.UNAUTHENTICATED.getCode())
+                .message(ErrorCode.UNAUTHENTICATED.getMessage())
+                .build();
 
-		// Ghi phản hồi dưới dạng JSON
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(response.getOutputStream(), apiResponse);
-		response.flushBuffer();
-	}
+        // Ghi phản hồi dưới dạng JSON
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), apiResponse);
+        response.flushBuffer();
+    }
 
-	@Override
-	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-		response.setContentType("application/json");
-		response.setStatus(ErrorCode.ACCESS_DENIED.getStatusCode().value());
+    @Override
+    public void handle(
+            HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
+            throws IOException, ServletException {
+        response.setContentType("application/json");
+        response.setStatus(ErrorCode.ACCESS_DENIED.getStatusCode().value());
 
-		ApiResponse<?> apiResponse = ApiResponse.builder()
-				.code(ErrorCode.ACCESS_DENIED.getCode())
-				.message(ErrorCode.ACCESS_DENIED.getMessage())
-				.build();
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(ErrorCode.ACCESS_DENIED.getCode())
+                .message(ErrorCode.ACCESS_DENIED.getMessage())
+                .build();
 
-		// Ghi phản hồi dưới dạng JSON
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(response.getOutputStream(), apiResponse);
-		response.flushBuffer();
-	}
+        // Ghi phản hồi dưới dạng JSON
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), apiResponse);
+        response.flushBuffer();
+    }
 
-	@Data
-	@AllArgsConstructor
-	private class ErrorResponse {
-		private int code;
-		private String message;
-	}
+    @Data
+    @AllArgsConstructor
+    private class ErrorResponse {
+        private int code;
+        private String message;
+    }
 }

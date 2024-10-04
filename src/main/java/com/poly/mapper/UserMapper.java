@@ -1,13 +1,14 @@
 package com.poly.mapper;
 
-import com.poly.dto.Request.UserRequest;
-import com.poly.dto.Response.UserResponse;
-import com.poly.entity.User;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
+import com.poly.dto.Request.UserRequest;
+import com.poly.dto.Response.UserResponse;
+import com.poly.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
