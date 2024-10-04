@@ -4,8 +4,6 @@ import com.poly.dto.Request.RoleRequest;
 import com.poly.dto.Response.RoleResponse;
 import com.poly.entity.Permission;
 import com.poly.entity.Role;
-import com.poly.exception.AppException;
-import com.poly.exception.ErrorCode;
 import com.poly.mapper.RoleMapper;
 import com.poly.repositories.PermissionRepository;
 import com.poly.repositories.RoleRepository;
@@ -17,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,25 +26,25 @@ public class RoleService {
     PermissionRepository permissionRepository;
     RoleMapper roleMapper;
 
-    public RoleResponse Create(RoleRequest request) {
+    public Optional<Role> getById(String role) {
+        return roleRepository.findById(role);
+    }
+
+    public RoleResponse create(RoleRequest request) {
         Role role = roleMapper.toRole(request);
 
         List<Permission> permissions = permissionRepository.findAllById(request.getPermissions());
-        role.setPermissions((Set<Permission>) permissions);
+        role.setPermissions(Set.copyOf(permissions));
 
         return roleMapper.toRoleResponse(roleRepository.save(role));
     }
 
     public List<RoleResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return roleMapper.toRoleResponseList(roleRepository.findByIsDeletedFalse(pageable).getContent());
+        return roleMapper.toRoleResponseList(roleRepository.findAll(pageable).getContent());
     }
 
     public void delete(String Name) {
-        Role role = roleRepository.findByNameAndIsDeletedFalse(Name)
-                .orElseThrow(() -> new AppException(ErrorCode.ID_NOT_FOUND));
-        role.setDeleted(true);
-
-        roleRepository.save(role);
+        roleRepository.deleteById(Name);
     }
 }

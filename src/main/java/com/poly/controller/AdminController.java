@@ -1,10 +1,12 @@
 package com.poly.controller;
 
 import com.poly.dto.Request.PermissionRequest;
+import com.poly.dto.Request.RoleRequest;
 import com.poly.dto.Request.UserRequest;
 import com.poly.dto.Response.ApiResponse;
 import com.poly.dto.Response.UserResponse;
 import com.poly.entity.Permission;
+import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.StringContent;
 import com.poly.exception.AppException;
@@ -17,13 +19,16 @@ import com.poly.services.PermissionService;
 import com.poly.services.RoleService;
 import com.poly.services.UserService;
 import io.micrometer.common.util.StringUtils;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,6 +60,15 @@ public class AdminController {
         return matcher.find();
     }
 
+    @GetMapping("/info")
+    public ApiResponse<?> getInfo(Authentication authentication) {
+        String userId = ((Jwt) authentication.getPrincipal()).getClaimAsString("userId");
+
+        User user = userService.getById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return GlobalException.AppResponse(userMapper.toUserResponse(user));
+    }
+
     @GetMapping("/user/get")
     public ApiResponse getAllUser(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
         List<UserResponse> responses = userService.getAll(page, size);
@@ -62,14 +76,7 @@ public class AdminController {
     }
 
     @PostMapping("/user/create")
-    public ApiResponse<?> createUser(@RequestBody UserRequest request) {
-        if (request.getUsername().length() < 6)
-            throw new AppException(ErrorCode.USERNAME_SHORT);
-        if (request.getPassword().length() < 6)
-            throw new AppException(ErrorCode.PASSWORD_SHORT);
-        if (!validate(request.getEmail()))
-            throw new AppException(ErrorCode.EMAIL_REGEX);
-
+    public ApiResponse<?> createUser(@RequestBody @Valid UserRequest request) {
         if (userService.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USERNAME_EXISTS);
         // encode password
@@ -82,12 +89,6 @@ public class AdminController {
 
     @PutMapping("/user/update")
     public ApiResponse<?> updateUser(@RequestBody UserRequest request) {
-        if (StringUtils.isNotBlank(request.getPassword()) || StringUtils.isNotBlank(request.getEmail())) {
-            if (request.getPassword().length() < 6)
-                throw new AppException(ErrorCode.PASSWORD_SHORT);
-            if (!validate(request.getEmail()))
-                throw new AppException(ErrorCode.EMAIL_REGEX);
-        }
         if (StringUtils.isNotBlank(request.getPassword()))
             request.setPassword(passwordEncoder.encode(request.getPassword()));
 
@@ -119,7 +120,7 @@ public class AdminController {
     @PutMapping("/permission/update")
     public ApiResponse<?> updatePermission(@RequestBody PermissionRequest request) {
         Permission permission = permissionService.getById(request.getName())
-                .orElseThrow(() -> new AppException(ErrorCode.ID_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
 
         // map những field không null từ request
         permissionMapper.updatePermissionFromPermissionRequest(permission, request);
@@ -130,6 +131,33 @@ public class AdminController {
     @DeleteMapping("/permission/delete/{permissionName}")
     public ApiResponse<?> deletePermission(@PathVariable String permissionName) {
         permissionService.delete(permissionName);
+        return GlobalException.AppResponse(Boolean.TRUE);
+    }
+
+    @PostMapping("/role/create")
+    public ApiResponse<?> createRole(@RequestBody RoleRequest request) {
+        return GlobalException.AppResponse(roleService.create(request));
+    }
+
+    @GetMapping("/role/get")
+    public ApiResponse<?> getAllRole(int page, int size) {
+        return GlobalException.AppResponse(roleService.getAll(page, size));
+    }
+
+    @PutMapping("/role/update")
+    public ApiResponse<?> updateRole(@RequestBody RoleRequest request) {
+        Role role = roleService.getById(request.getName())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+
+        // map những field không null từ request
+        roleMapper.updateRoleFromRoleRequest(role, request);
+
+        return GlobalException.AppResponse(roleService.create(request));
+    }
+
+    @DeleteMapping("/role/delete/{roleName}")
+    public ApiResponse<?> deleteRole(@PathVariable String roleName) {
+        roleService.delete(roleName);
         return GlobalException.AppResponse(Boolean.TRUE);
     }
 }

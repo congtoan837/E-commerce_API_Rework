@@ -5,6 +5,7 @@ import com.poly.dto.Response.RoleResponse;
 import com.poly.entity.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -17,5 +18,6 @@ public interface RoleMapper {
 
     List<RoleResponse> toRoleResponseList(List<Role> roles);
 
-//    void updateUserFromUserRequest(@MappingTarget User user, UserRequest request);
+    @Mapping(target = "permissions", ignore = true)
+    void updateRoleFromRoleRequest(@MappingTarget Role role, RoleRequest request);
 }

@@ -10,7 +10,4 @@ import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, String> {
-    Page<Role> findByIsDeletedFalse(Pageable pageable);
-
-    Optional<Role> findByNameAndIsDeletedFalse(String Name);
 }

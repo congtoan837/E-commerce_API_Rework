@@ -2,10 +2,13 @@ package com.poly.dto.Request;
 
 import com.poly.dto.Response.CategoryResponse;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 public class ProductPostDto {
 
     private Long id;

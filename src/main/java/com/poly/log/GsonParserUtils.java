@@ -1,4 +1,4 @@
-package com.poly.logging;
+package com.poly.log;
 
 import com.google.gson.Gson;
 

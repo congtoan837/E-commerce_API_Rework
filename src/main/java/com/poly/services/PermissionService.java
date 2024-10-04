@@ -35,14 +35,10 @@ public class PermissionService {
 
     public List<PermissionResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return permissionMapper.toPermissionResponseList(permissionRepository.findByIsDeletedFalse(pageable).getContent());
+        return permissionMapper.toPermissionResponseList(permissionRepository.findAll(pageable).getContent());
     }
 
     public void delete(String Id) {
-        Permission permission = permissionRepository.findByNameAndIsDeletedFalse(Id)
-                .orElseThrow(() -> new AppException(ErrorCode.ID_NOT_FOUND));
-        permission.setDeleted(true);
-
-        permissionRepository.save(permission);
+        permissionRepository.deleteById(Id);
     }
 }

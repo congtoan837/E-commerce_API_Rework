@@ -22,8 +22,6 @@ public class Role {
     private String name;
     @Column
     private String description;
-    @Column
-    private boolean isDeleted;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(

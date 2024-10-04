@@ -1,4 +1,4 @@
-package com.poly.logging;
+package com.poly.log;
 
 import lombok.extern.slf4j.Slf4j;
 import jakarta.servlet.Filter;

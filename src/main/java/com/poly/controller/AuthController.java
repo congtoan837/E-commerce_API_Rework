@@ -4,18 +4,13 @@ import com.poly.dto.Request.LoginRequest;
 import com.poly.dto.Request.UserRequest;
 import com.poly.dto.Response.ApiResponse;
 import com.poly.dto.Response.JwtResponse;
-import com.poly.dto.Response.UserResponse;
-import com.poly.entity.Role;
-import com.poly.entity.User;
-import com.poly.ex.ERole;
-import com.poly.ex.ModelMapperConfig;
-import com.poly.ex.StringContent;
+import com.poly.Config.ModelMapperConfig;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.exception.GlobalException;
 import com.poly.services.AuthService;
 import com.poly.services.UserService;
-import io.micrometer.common.util.StringUtils;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,9 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,14 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ApiResponse<?> signup(@RequestBody UserRequest request) {
-        if (request.getUsername().length() < 6)
-            throw new AppException(ErrorCode.USERNAME_SHORT);
-        if (request.getPassword().length() < 6)
-            throw new AppException(ErrorCode.PASSWORD_SHORT);
-        if (!validate(request.getEmail()))
-            throw new AppException(ErrorCode.EMAIL_REGEX);
-
+    public ApiResponse<?> signup(@RequestBody @Valid UserRequest request) {
         if (userService.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USERNAME_EXISTS);
 

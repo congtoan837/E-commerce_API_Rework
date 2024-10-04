@@ -1,4 +1,4 @@
-package com.poly.logging;
+package com.poly.log;
 
 import com.poly.ex.IPClient;
 import jakarta.servlet.http.HttpServletRequest;

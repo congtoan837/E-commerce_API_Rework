@@ -2,21 +2,30 @@ package com.poly.exception;
 
 import com.poly.dto.Response.ApiResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
-public class GlobalException extends ResponseEntityExceptionHandler {
+public class GlobalException {
     @ResponseBody
     public static <T> ApiResponse<T> AppResponse(T body) {
         return new ApiResponse<>(1, null, body);
     }
 
-    public static <T> ApiResponse<T> AppResponse(Void aVoid) {
-        return new ApiResponse<>(1, null, (T) Boolean.TRUE);
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse> handleValidationExceptions(MethodArgumentNotValidException exception) {
+        String errorMessage = exception.getFieldError().getDefaultMessage();
+
+        ErrorCode errorCode = ErrorCode.valueOf(errorMessage);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build();
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
 
     @ExceptionHandler(value = Exception.class)

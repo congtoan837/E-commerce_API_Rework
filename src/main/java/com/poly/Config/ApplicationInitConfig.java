@@ -1,4 +1,4 @@
-package com.poly.security;
+package com.poly.Config;
 
 import com.poly.entity.Role;
 import com.poly.entity.User;
@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
-import java.util.HashSet;
 
 @Configuration
 public class ApplicationInitConfig {

@@ -22,8 +22,6 @@ public class Permission {
     private String name;
     @Column
     private String description;
-    @Column
-    private boolean isDeleted;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

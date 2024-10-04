@@ -2,6 +2,7 @@ package com.poly.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
@@ -13,10 +14,14 @@ public enum ErrorCode {
     ACCESS_DENIED(-1, "Access denied", HttpStatus.FORBIDDEN),
     USER_NOT_FOUND(-1, "user not found", HttpStatus.BAD_REQUEST),
     USERNAME_EXISTS(-1, "Username exists", HttpStatus.BAD_REQUEST),
-    USERNAME_SHORT(-1, "Username too short", HttpStatus.BAD_REQUEST),
-    PASSWORD_SHORT(-1, "Password too short", HttpStatus.BAD_REQUEST),
-    EMAIL_REGEX(-1, "Email incorrect", HttpStatus.BAD_REQUEST),
-    ID_NOT_FOUND(-1, "Id not found", HttpStatus.BAD_REQUEST),
+    USERNAME_INVALID(-1, "Username invalid", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(-1, "Password invalid", HttpStatus.BAD_REQUEST),
+    USERNAME_SHORT(-1, "Username must be at least 6 characters", HttpStatus.BAD_REQUEST),
+    PASSWORD_SHORT(-1, "Username must be at least 6 characters", HttpStatus.BAD_REQUEST),
+    ROLES_INVALID(-1, "Roles invalid", HttpStatus.BAD_REQUEST),
+    INPUT_VALID(-1, "Input invalid", HttpStatus.BAD_REQUEST),
+    EMAIL_INVALID(-1, "Email invalid", HttpStatus.BAD_REQUEST),
+    NOT_FOUND(-1, "Not found", HttpStatus.BAD_REQUEST),
 
 ;
     private int code;
