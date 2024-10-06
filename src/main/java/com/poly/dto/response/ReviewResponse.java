@@ -1,11 +1,13 @@
-package com.poly.dto.Response;
+package com.poly.dto.response;
 
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 public class ReviewResponse {
 
-    private Long id;
+    private UUID id;
 
     private int rating;
 
@@ -13,10 +15,10 @@ public class ReviewResponse {
 
     private String comment;
 
-    private UserReviewDto user;
+    private UserReview userReview;
 
     @Data
-    public class UserReviewDto {
+    public class UserReview {
 
         private Long id;
 

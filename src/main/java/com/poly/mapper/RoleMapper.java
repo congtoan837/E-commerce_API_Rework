@@ -6,8 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.poly.dto.Request.RoleRequest;
-import com.poly.dto.Response.RoleResponse;
+import com.poly.dto.request.RoleRequest;
+import com.poly.dto.response.RoleResponse;
 import com.poly.entity.Role;
 
 @Mapper(componentModel = "spring")

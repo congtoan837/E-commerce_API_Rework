@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.poly.dto.Response.ImageResponse;
+import com.poly.dto.response.ImageResponse;
 import com.poly.entity.User;
 import com.poly.ex.AmazonClient;
 

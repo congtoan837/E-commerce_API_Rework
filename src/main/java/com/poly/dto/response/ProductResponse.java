@@ -1,13 +1,14 @@
-package com.poly.dto.Response;
+package com.poly.dto.response;
 
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.Data;
 
 @Data
 public class ProductResponse {
 
-    private Long id;
+    private UUID id;
 
     private String name;
 
@@ -19,7 +20,7 @@ public class ProductResponse {
 
     private Set<CategoryResponse> categories;
 
-    private String cover_image;
+    private String coverImage;
 
     private Set<String> images;
 

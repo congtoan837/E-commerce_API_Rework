@@ -1,7 +1,4 @@
-package com.poly.Config;
-
-import java.util.List;
-import java.util.stream.Collectors;
+package com.poly.config;
 
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -18,12 +15,5 @@ public class ModelMapperConfig extends ModelMapper {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         return modelMapper;
-    }
-
-    // Phương thức chung để map từ danh sách source sang target class
-    public <T, U> List<U> mapList(List<T> sourceList, Class<U> targetClass) {
-        return sourceList.stream()
-                .map(element -> modelMapper().map(element, targetClass))
-                .collect(Collectors.toList());
     }
 }

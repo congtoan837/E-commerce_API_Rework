@@ -13,11 +13,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poly.dto.Response.ApiResponse;
+import com.poly.dto.response.ApiResponse;
 import com.poly.exception.ErrorCode;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint, AccessDeniedHandler {
@@ -25,7 +22,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint, AccessDenied
     @Override
     public void commence(
             HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, IOException {
+            throws IOException {
         response.setContentType("application/json");
         response.setStatus(ErrorCode.UNAUTHENTICATED.getStatusCode().value());
 
@@ -56,12 +53,5 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint, AccessDenied
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), apiResponse);
         response.flushBuffer();
-    }
-
-    @Data
-    @AllArgsConstructor
-    private class ErrorResponse {
-        private int code;
-        private String message;
     }
 }

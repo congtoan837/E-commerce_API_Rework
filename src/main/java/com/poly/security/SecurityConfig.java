@@ -47,6 +47,8 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authEntryPointJwt())
                 .accessDeniedHandler(authEntryPointJwt()));
 
+        http.cors();
+
         http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();

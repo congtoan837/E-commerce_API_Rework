@@ -1,15 +1,14 @@
 package com.poly.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.poly.dto.Request.RoleRequest;
-import com.poly.dto.Response.RoleResponse;
+import com.poly.dto.request.RoleRequest;
+import com.poly.dto.response.RoleResponse;
 import com.poly.entity.Permission;
 import com.poly.entity.Role;
 import com.poly.mapper.RoleMapper;
@@ -27,10 +26,6 @@ public class RoleService {
     RoleRepository roleRepository;
     PermissionRepository permissionRepository;
     RoleMapper roleMapper;
-
-    public Optional<Role> getById(String role) {
-        return roleRepository.findById(role);
-    }
 
     public RoleResponse create(RoleRequest request) {
         Role role = roleMapper.toRole(request);

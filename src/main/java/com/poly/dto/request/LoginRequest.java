@@ -1,4 +1,4 @@
-package com.poly.dto.Request;
+package com.poly.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.poly.dto.Request.UserRequest;
-import com.poly.dto.Response.UserResponse;
+import com.poly.dto.request.UserRequest;
+import com.poly.dto.response.UserResponse;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.exception.AppException;
@@ -44,12 +44,22 @@ public class UserService {
                 userRepository.findByIsDeletedFalse(pageable).getContent());
     }
 
-    public Optional<User> getById(UUID id) {
-        return userRepository.findById(id);
+    public UserResponse update(UserRequest request) {
+        User user =
+                userRepository.findById(request.getId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        userMapper.updateUserFromUserRequest(user, request);
+
+        List<Role> roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(Set.copyOf(roles));
+
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public Optional<User> getById(String id) {
-        return userRepository.findById(UUID.fromString(id));
+    public UserResponse getInfo(String id) {
+        User user =
+                userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+
+        return userMapper.toUserResponse(user);
     }
 
     public Optional<User> getByUsername(String value) {

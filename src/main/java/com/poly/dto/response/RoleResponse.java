@@ -1,4 +1,4 @@
-package com.poly.dto.Response;
+package com.poly.dto.response;
 
 import java.util.Set;
 

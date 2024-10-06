@@ -1,4 +1,4 @@
-package com.poly.Config;
+package com.poly.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

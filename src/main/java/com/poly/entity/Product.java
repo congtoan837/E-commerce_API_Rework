@@ -40,7 +40,7 @@ public class Product {
     private String status;
 
     @Column
-    private String cover_image;
+    private String coverImage;
 
     @ElementCollection
     private Set<String> images;

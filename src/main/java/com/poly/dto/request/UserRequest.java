@@ -1,4 +1,4 @@
-package com.poly.dto.Request;
+package com.poly.dto.request;
 
 import java.util.Set;
 import java.util.UUID;

@@ -5,17 +5,19 @@ import java.util.regex.Pattern;
 
 import jakarta.validation.Valid;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poly.Config.ModelMapperConfig;
-import com.poly.dto.Request.LoginRequest;
-import com.poly.dto.Request.UserRequest;
-import com.poly.dto.Response.ApiResponse;
-import com.poly.dto.Response.JwtResponse;
+import com.poly.config.ModelMapperConfig;
+import com.poly.dto.request.LoginRequest;
+import com.poly.dto.request.UserRequest;
+import com.poly.dto.response.ApiResponse;
+import com.poly.dto.response.JwtResponse;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.exception.GlobalException;
@@ -26,7 +28,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -55,6 +56,13 @@ public class AuthController {
         if (userService.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USERNAME_EXISTS);
 
         return GlobalException.AppResponse(userService.create(request));
+    }
+
+    @GetMapping("/infoUser")
+    public ApiResponse<?> getInfo(Authentication authentication) {
+        String userId = ((Jwt) authentication.getPrincipal()).getClaimAsString("userId");
+
+        return GlobalException.AppResponse(userService.getInfo(userId));
     }
 
     //    @GetMapping("/verify")

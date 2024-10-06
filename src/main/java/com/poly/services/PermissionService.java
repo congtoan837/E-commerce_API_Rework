@@ -1,14 +1,13 @@
 package com.poly.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.poly.dto.Request.PermissionRequest;
-import com.poly.dto.Response.PermissionResponse;
+import com.poly.dto.request.PermissionRequest;
+import com.poly.dto.response.PermissionResponse;
 import com.poly.entity.Permission;
 import com.poly.mapper.PermissionMapper;
 import com.poly.repositories.PermissionRepository;
@@ -23,10 +22,6 @@ import lombok.experimental.FieldDefaults;
 public class PermissionService {
     PermissionRepository permissionRepository;
     PermissionMapper permissionMapper;
-
-    public Optional<Permission> getById(String id) {
-        return permissionRepository.findById(id);
-    }
 
     public PermissionResponse create(PermissionRequest request) {
         Permission permission = permissionMapper.toPermission(request);

@@ -5,14 +5,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import jakarta.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.poly.dto.Response.ImageResponse;
+import com.poly.dto.response.ImageResponse;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -22,8 +25,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
+@Slf4j
 public class AmazonClient {
-
     private S3Client s3client;
 
     @Value("${endpointUrl}")
@@ -88,7 +91,7 @@ public class AmazonClient {
 
             s3client.putObject(putObjectRequest, Paths.get(file.getAbsolutePath()));
         } catch (S3Exception e) {
-            System.err.println(e.awsErrorDetails().errorMessage());
+            log.error(e.awsErrorDetails().errorMessage());
         }
     }
 }

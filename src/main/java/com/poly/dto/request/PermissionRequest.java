@@ -1,14 +1,11 @@
-package com.poly.dto.Request;
-
-import java.util.Set;
+package com.poly.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RoleRequest {
+public class PermissionRequest {
     private String name;
     private String description;
-    private Set<String> permissions;
 }

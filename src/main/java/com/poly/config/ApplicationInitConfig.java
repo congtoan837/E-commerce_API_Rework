@@ -1,4 +1,4 @@
-package com.poly.Config;
+package com.poly.config;
 
 import java.util.Collections;
 

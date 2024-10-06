@@ -1,4 +1,4 @@
-package com.poly.Validator;
+package com.poly.validator;
 
 import java.lang.annotation.*;
 
