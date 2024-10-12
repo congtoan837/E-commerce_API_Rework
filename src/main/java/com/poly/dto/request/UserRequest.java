@@ -3,7 +3,6 @@ package com.poly.dto.request;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -21,7 +20,7 @@ public class UserRequest {
 
     private String image;
 
-    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "EMAIL_INVALID")
+    //    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "EMAIL_INVALID")
     private String email;
 
     private String address;

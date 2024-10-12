@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.PermissionRequest;
@@ -29,7 +30,7 @@ public class PermissionService {
     }
 
     public List<PermissionResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
         return permissionMapper.toPermissionResponseList(
                 permissionRepository.findAll(pageable).getContent());
     }

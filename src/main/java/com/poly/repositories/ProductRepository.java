@@ -3,7 +3,6 @@ package com.poly.repositories;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.poly.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

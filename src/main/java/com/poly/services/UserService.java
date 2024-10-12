@@ -2,8 +2,10 @@ package com.poly.services;
 
 import java.util.*;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.UserRequest;
@@ -33,15 +35,29 @@ public class UserService {
         User user = userMapper.toUser(request);
 
         List<Role> roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(Set.copyOf(roles));
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public List<UserResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return userMapper.toUserResponseList(
-                userRepository.findByIsDeletedFalse(pageable).getContent());
+    public List<UserResponse> getAll(String keyword, int page, int size) {
+        keyword = keyword.trim();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
+        return userMapper.toUserResponseList(userRepository
+                .searchByKeyword(UUID.fromString("d3958730-f411-47f0-a796-ff89de8276ff"), keyword, pageable)
+                .getContent());
+    }
+
+    public long countAll(String keyword) {
+        keyword = keyword.trim();
+
+        return userRepository.countByKeyword(UUID.fromString("d3958730-f411-47f0-a796-ff89de8276ff"), keyword);
+    }
+
+    public Page<User> getUser() {
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.ASC, "createTime"));
+        return userRepository.findAll(pageable);
     }
 
     public UserResponse update(UserRequest request) {
@@ -50,7 +66,7 @@ public class UserService {
         userMapper.updateUserFromUserRequest(user, request);
 
         List<Role> roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(Set.copyOf(roles));
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -67,12 +83,12 @@ public class UserService {
     }
 
     public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return userRepository.existsByUsernameAndIsDeletedFalse(username);
     }
 
-    public void delete(UUID Id) {
+    public void delete(UUID id) {
         User user =
-                userRepository.findByIdAndIsDeletedFalse(Id).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+                userRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
         user.setDeleted(true);
 
         userRepository.save(user);

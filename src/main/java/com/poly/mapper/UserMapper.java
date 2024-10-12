@@ -13,6 +13,8 @@ import com.poly.entity.User;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "reviews", ignore = true)
     User toUser(UserRequest request);
 
     UserResponse toUserResponse(User user);
@@ -20,5 +22,7 @@ public interface UserMapper {
     List<UserResponse> toUserResponseList(List<User> users);
 
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "reviews", ignore = true)
     void updateUserFromUserRequest(@MappingTarget User user, UserRequest request);
 }

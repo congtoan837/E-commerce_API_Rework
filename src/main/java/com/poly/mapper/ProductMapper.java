@@ -1,13 +1,14 @@
 package com.poly.mapper;
 
-import com.poly.dto.request.ProductRequest;
-import com.poly.dto.response.ProductResponse;
-import com.poly.entity.Product;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
+import com.poly.dto.request.ProductRequest;
+import com.poly.dto.response.ProductResponse;
+import com.poly.entity.Product;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {

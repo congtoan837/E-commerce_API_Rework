@@ -27,7 +27,7 @@ public class SecurityConfig {
     @Value("${signerKey}")
     protected String SIGNER_KEY;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/login", "/signup"};
+    private final String[] PUBLIC_ENDPOINTS = {"/login", "/signup", "/refreshToken"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

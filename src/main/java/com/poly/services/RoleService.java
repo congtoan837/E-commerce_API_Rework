@@ -1,10 +1,11 @@
 package com.poly.services;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.RoleRequest;
@@ -31,13 +32,13 @@ public class RoleService {
         Role role = roleMapper.toRole(request);
 
         List<Permission> permissions = permissionRepository.findAllById(request.getPermissions());
-        role.setPermissions(Set.copyOf(permissions));
+        role.setPermissions(new HashSet<>(permissions));
 
         return roleMapper.toRoleResponse(roleRepository.save(role));
     }
 
     public List<RoleResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
         return roleMapper.toRoleResponseList(roleRepository.findAll(pageable).getContent());
     }
 

@@ -21,7 +21,7 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
-            if (userRepository.existsByUsername("admin")) return;
+            if (userRepository.existsByUsernameAndIsDeletedFalse("admin")) return;
 
             User user = User.builder()
                     .username("admin")

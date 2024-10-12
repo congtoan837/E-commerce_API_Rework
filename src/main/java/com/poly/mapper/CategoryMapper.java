@@ -1,12 +1,13 @@
 package com.poly.mapper;
 
-import com.poly.dto.request.CategoryRequest;
-import com.poly.dto.response.CategoryResponse;
-import com.poly.entity.Category;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
+import com.poly.dto.request.CategoryRequest;
+import com.poly.dto.response.CategoryResponse;
+import com.poly.entity.Category;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {

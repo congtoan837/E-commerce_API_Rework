@@ -1,5 +1,6 @@
 package com.poly.controller;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,55 +47,29 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ApiResponse<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ApiResponse<?> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
         JwtResponse response = authService.authenticate(loginRequest);
-        return GlobalException.AppResponse(response);
+        return GlobalException.appResponse(response);
+    }
+
+    @PostMapping("/refreshToken")
+    public ApiResponse<?> refreshToken(@RequestBody @Valid Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        JwtResponse response = authService.refreshToken(refreshToken);
+        return GlobalException.appResponse(response);
     }
 
     @PostMapping("/signup")
     public ApiResponse<?> signup(@RequestBody @Valid UserRequest request) {
         if (userService.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USERNAME_EXISTS);
 
-        return GlobalException.AppResponse(userService.create(request));
+        return GlobalException.appResponse(userService.create(request));
     }
 
     @GetMapping("/infoUser")
     public ApiResponse<?> getInfo(Authentication authentication) {
         String userId = ((Jwt) authentication.getPrincipal()).getClaimAsString("userId");
 
-        return GlobalException.AppResponse(userService.getInfo(userId));
+        return GlobalException.appResponse(userService.getInfo(userId));
     }
-
-    //    @GetMapping("/verify")
-    //    public Object verifyAccount(@RequestParam("code") String code) {
-    //        User user = userService.getByVerifyCode(code);
-    //        if (user.isEnabled()) {
-    //            return true;
-    //        }
-    //
-    //        userService.findByVerifyCodeAndEnable(code);
-    //        return new ResponseEntity<>(null, "Verify success!", HttpStatus.OK);
-    //    }
-    //
-    //    private void sendVerificationEmail(SignupRequest request, User user, String siteURL) throws
-    // MessagingException, UnsupportedEncodingException {
-    //        MimeMessage message = mailSender.createMimeMessage();
-    //        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-    //
-    //        String subject = "Kích hoạt tài khoản của bạn";
-    //        String senderMail = "congtoan837@gmail.com";
-    //        String senderName = "E-Commerce";
-    //        String mailContent = "<p>Xin chào " + request.getName() + ",</p>";
-    //        mailContent += "<p>Để kích hoạt tài khoản, bạn vui lòng nhấp vào link dưới đây:</p>";
-    //        mailContent += "<p>" + siteURL + "/verify?code=" + user.getVerifyCode() + "</p>";
-    //        mailContent += "<p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
-    //
-    //        message.setContent(mailContent, "text/html; charset=utf-8");
-    //
-    //        helper.setTo(request.getEmail());
-    //        helper.setFrom(senderMail, senderName);
-    //        helper.setSubject(subject);
-    //
-    //        this.mailSender.send(message);
-    //    }
 }

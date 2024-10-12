@@ -1,8 +1,8 @@
 package com.poly.dto.response;
 
-import lombok.Data;
-
 import java.util.UUID;
+
+import lombok.Data;
 
 @Data
 public class ReviewResponse {

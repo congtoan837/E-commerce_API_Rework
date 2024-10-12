@@ -10,6 +10,4 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UsersController {
-
-}
+public class UsersController {}

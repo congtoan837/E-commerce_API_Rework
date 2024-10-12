@@ -1,5 +1,12 @@
 package com.poly.services;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.poly.dto.request.CategoryRequest;
 import com.poly.dto.response.CategoryResponse;
 import com.poly.entity.Category;
@@ -7,14 +14,10 @@ import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.mapper.CategoryMapper;
 import com.poly.repositories.CategoryRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +32,7 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
         return categoryMapper.toUserResponseList(
                 categoryRepository.findAll(pageable).getContent());
     }
