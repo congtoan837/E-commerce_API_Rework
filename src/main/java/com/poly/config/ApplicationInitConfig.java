@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.ex.ERole;
+import com.poly.repositories.RoleRepository;
 import com.poly.repositories.UserRepository;
 
 @Configuration
@@ -19,9 +20,23 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
+            //            Set<User> userSet = UserDataGenerator.createSampleUsers();
+            //            userRepository.saveAll(userSet);
+
+            //            PaymentRequest request = new PaymentRequest();
+            //            request.setAmount(10000);
+            //            request.setOrderId(UUID.randomUUID());
+            //
+            //            ConfigPayment configPayment = new ConfigPayment();
+            //            configPayment.createVnPayPayment(request);
+
             if (userRepository.existsByUsernameAndIsDeletedFalse("admin")) return;
+            for (ERole eRole : ERole.values()) {
+                Role role = Role.builder().name(eRole.name()).build();
+                roleRepository.save(role);
+            }
 
             User user = User.builder()
                     .username("admin")

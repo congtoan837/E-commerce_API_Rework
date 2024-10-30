@@ -3,9 +3,6 @@ package com.poly.services;
 import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.RoleRequest;
@@ -37,9 +34,8 @@ public class RoleService {
         return roleMapper.toRoleResponse(roleRepository.save(role));
     }
 
-    public List<RoleResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        return roleMapper.toRoleResponseList(roleRepository.findAll(pageable).getContent());
+    public List<RoleResponse> getAll() {
+        return roleMapper.toRoleResponseList(roleRepository.findAll());
     }
 
     public void delete(String Name) {

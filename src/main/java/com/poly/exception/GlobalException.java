@@ -4,18 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.poly.dto.response.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalException extends Exception {
-    @ResponseBody
-    public static <T> ApiResponse<T> appResponse(T body) {
-        return new ApiResponse<>(1, null, body);
-    }
-
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationExceptions(MethodArgumentNotValidException exception) {
         ErrorCode errorCode = ErrorCode.INPUT_VALID;

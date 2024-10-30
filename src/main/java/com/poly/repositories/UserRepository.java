@@ -18,22 +18,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByUsernameAndIsDeletedFalse(String username);
 
-    @Query("SELECT u FROM User u WHERE u.id <> :id AND u.isDeleted = false " + "AND (u.username LIKE %:keyword% OR "
-            + "u.name LIKE %:keyword% OR "
-            + "u.email LIKE %:keyword% OR "
-            + "u.phone LIKE %:keyword% OR "
-            + "u.address LIKE %:keyword%)")
-    Page<User> searchByKeyword(@Param("id") UUID id, @Param("keyword") String keyword, Pageable pageable);
-
-    @Query("SELECT COUNT(u.id) FROM User u WHERE u.id <> :id AND u.isDeleted = false "
-            + "AND (u.username LIKE %:keyword% OR "
-            + "u.name LIKE %:keyword% OR "
-            + "u.email LIKE %:keyword% OR "
-            + "u.phone LIKE %:keyword% OR "
-            + "u.address LIKE %:keyword%)")
-    long countByKeyword(@Param("id") UUID id, @Param("keyword") String keyword);
-
-    Page<User> findByIdNotAndIsDeletedFalseAndNameContaining(UUID id, String keyword, Pageable pageable);
+    @Query("SELECT u FROM User u WHERE u.username <> :username AND u.isDeleted = false "
+            + "AND (u.username ILIKE %:keyword% OR "
+            + "u.name ILIKE %:keyword% OR remove_accent(u.name) ILIKE %:keyword% OR "
+            + "u.email ILIKE %:keyword% OR "
+            + "u.phone ILIKE %:keyword% OR "
+            + "u.address ILIKE %:keyword% OR remove_accent(u.address) ILIKE %:keyword%)")
+    Page<User> searchByKeywordWithoutUsername(
+            @Param("username") String username, @Param("keyword") String keyword, Pageable pageable);
 
     Optional<User> findByIdAndIsDeletedFalse(UUID id);
 }

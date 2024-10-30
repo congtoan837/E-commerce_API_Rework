@@ -2,9 +2,6 @@ package com.poly.services;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.CategoryRequest;
@@ -31,10 +28,8 @@ public class CategoryService {
         return categoryMapper.toCategoryResponse(category);
     }
 
-    public List<CategoryResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        return categoryMapper.toUserResponseList(
-                categoryRepository.findAll(pageable).getContent());
+    public List<CategoryResponse> getAll() {
+        return categoryMapper.toUserResponseList(categoryRepository.findAll());
     }
 
     public CategoryResponse update(CategoryRequest request) {

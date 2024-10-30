@@ -2,9 +2,6 @@ package com.poly.services;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.PermissionRequest;
@@ -29,13 +26,11 @@ public class PermissionService {
         return permissionMapper.toPermissionResponse(permissionRepository.save(permission));
     }
 
-    public List<PermissionResponse> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        return permissionMapper.toPermissionResponseList(
-                permissionRepository.findAll(pageable).getContent());
+    public List<PermissionResponse> getAll() {
+        return permissionMapper.toPermissionResponseList(permissionRepository.findAll());
     }
 
-    public void delete(String Id) {
-        permissionRepository.deleteById(Id);
+    public void delete(String id) {
+        permissionRepository.deleteById(id);
     }
 }

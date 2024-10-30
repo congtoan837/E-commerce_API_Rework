@@ -31,16 +31,28 @@ public class Order {
     private UUID id;
 
     @Column
-    private String OrderPhone;
+    private String orderName;
 
     @Column
-    private String OrderAddress;
+    private String orderPhone;
 
     @Column
-    private byte Quantity;
+    private String orderAddress;
 
     @Column
-    private byte Status;
+    private String voucherCode;
+
+    @Column(nullable = false)
+    private Long originalAmount;
+
+    @Column(nullable = false)
+    private Long discountAmount;
+
+    @Column(nullable = false)
+    private Long totalAmount;
+
+    @Column(nullable = false)
+    private String status;
 
     @Column
     private String note;
@@ -48,9 +60,11 @@ public class Order {
     @Column
     private boolean isDeleted;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private Set<Product> products;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<OrderItem> orderItems;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Voucher voucher;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

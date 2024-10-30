@@ -12,11 +12,11 @@ public class ProductResponse {
 
     private String name;
 
-    private String url;
-
-    private String shortDescription;
+    private String description;
 
     private String price;
+
+    private String status;
 
     private Set<CategoryResponse> categories;
 

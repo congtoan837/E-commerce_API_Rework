@@ -31,7 +31,7 @@ public class Product {
     private String name;
 
     @Column
-    private String note;
+    private String description;
 
     @Column
     private Long price;

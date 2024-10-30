@@ -55,7 +55,8 @@ public class AuthService {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(
+                        new Date(Instant.now().plus(15, ChronoUnit.MINUTES).toEpochMilli()))
                 .claim("userId", user.getId())
                 .claim("scope", buildScope(user))
                 .build();

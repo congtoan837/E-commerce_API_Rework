@@ -1,5 +1,8 @@
 package com.poly.dto.response;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -12,12 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-public class ApiResponse<T> {
-    @Builder.Default
-    private int code = 1;
+public class PageResponse<T> {
+    private int totalPages;
+    private int pageSize;
+    private long totalElements;
 
     @Builder.Default
-    private String message = null;
-
-    private T result;
+    private List<T> data = Collections.emptyList();
 }

@@ -2,13 +2,17 @@ package com.poly.services;
 
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.UserRequest;
+import com.poly.dto.response.PageResponse;
 import com.poly.dto.response.UserResponse;
 import com.poly.entity.Role;
 import com.poly.entity.User;
@@ -31,6 +35,13 @@ public class UserService {
 
     UserMapper userMapper;
 
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        return userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
     public UserResponse create(UserRequest request) {
         User user = userMapper.toUser(request);
 
@@ -40,19 +51,15 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public List<UserResponse> getAll(String keyword, int page, int size) {
-        keyword = keyword.trim();
+    public PageResponse<UserResponse> getAll(String keyword, int page, int size) {
+        if (StringUtils.isNotBlank(keyword))
+            keyword = StringUtils.lowerCase(keyword).trim();
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        return userMapper.toUserResponseList(userRepository
-                .searchByKeyword(UUID.fromString("d3958730-f411-47f0-a796-ff89de8276ff"), keyword, pageable)
-                .getContent());
-    }
+        Sort sort = Sort.by(Sort.Direction.DESC, "createTime");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-    public long countAll(String keyword) {
-        keyword = keyword.trim();
-
-        return userRepository.countByKeyword(UUID.fromString("d3958730-f411-47f0-a796-ff89de8276ff"), keyword);
+        var pageResult = userRepository.searchByKeywordWithoutUsername("admin", keyword, pageable);
+        return userMapper.toPageResponse(pageResult);
     }
 
     public Page<User> getUser() {
@@ -71,11 +78,8 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public UserResponse getInfo(String id) {
-        User user =
-                userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
-
-        return userMapper.toUserResponse(user);
+    public UserResponse getInfo() {
+        return userMapper.toUserResponse(getCurrentUser());
     }
 
     public Optional<User> getByUsername(String value) {
@@ -86,11 +90,12 @@ public class UserService {
         return userRepository.existsByUsernameAndIsDeletedFalse(username);
     }
 
-    public void delete(UUID id) {
+    public boolean delete(UUID id) {
         User user =
                 userRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
         user.setDeleted(true);
-
         userRepository.save(user);
+
+        return Boolean.TRUE;
     }
 }

@@ -24,7 +24,11 @@ public enum ErrorCode {
     INPUT_VALID(-1, "Input invalid", HttpStatus.BAD_REQUEST),
     EMAIL_INVALID(-1, "Email invalid", HttpStatus.BAD_REQUEST),
     NOT_FOUND(-1, "Not found", HttpStatus.BAD_REQUEST),
-    ;
+    CART_NOT_FOUND(-1, "Cart not found", HttpStatus.BAD_REQUEST),
+    PRODUCT_NOT_FOUND_IN_CART(-1, "product not found in cart", HttpStatus.BAD_REQUEST),
+    VOUCHER_NOT_FOUND(-1, "Voucher not found", HttpStatus.BAD_REQUEST),
+    VOUCHER_INVALID(-1, "Voucher invalid", HttpStatus.BAD_REQUEST),
+    ORDER_NOT_FOUND(-1, "Order not found", HttpStatus.BAD_REQUEST);
     private int code;
     private String message;
     private HttpStatusCode statusCode;
