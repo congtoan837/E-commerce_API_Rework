@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poly.dto.request.UserRequest;
-import com.poly.dto.response.UserResponse;
+import com.poly.dto.response.user.UserResponse;
 import com.poly.services.UserService;
 
 @SpringBootTest

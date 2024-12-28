@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 
 import com.poly.dto.request.UserRequest;
 import com.poly.dto.response.PageResponse;
-import com.poly.dto.response.UserResponse;
+import com.poly.dto.response.user.UserResponse;
 import com.poly.entity.User;
 
 @Mapper(componentModel = "spring")

@@ -47,10 +47,19 @@ public class Voucher {
     private Set<Product> products;
 
     @Column
-    private Long value;
+    private long value;
+
+    @Column
+    private long maxValue;
 
     @Column
     private boolean isPercent;
+
+    @Column
+    private Long limitQuantity;
+
+    @Column
+    private int consumedQuantity;
 
     @Column
     private LocalDate startDate;
@@ -59,7 +68,7 @@ public class Voucher {
     private LocalDate endDate;
 
     @Column
-    private boolean isActive;
+    private String status; // active, inactive, expired
 
     @Column
     private boolean isDeleted;

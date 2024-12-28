@@ -1,19 +1,17 @@
 package com.poly.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
-import com.poly.dto.request.CategoryRequest;
 import com.poly.dto.request.ProductRequest;
 import com.poly.dto.response.ApiResponse;
-import com.poly.dto.response.CategoryResponse;
 import com.poly.dto.response.PageResponse;
-import com.poly.dto.response.ProductResponse;
-import com.poly.services.CategoryService;
+import com.poly.dto.response.product.ProductResponse;
 import com.poly.services.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductController {
     ProductService productService;
-    CategoryService categoryService;
 
     @PostMapping("/create")
     public ApiResponse<ProductResponse> createProduct(@RequestBody @Valid ProductRequest request) {
@@ -52,26 +50,6 @@ public class ProductController {
     @DeleteMapping("/delete/{productName}")
     public ApiResponse<Boolean> deleteProduct(@PathVariable @Valid UUID productName) {
         productService.delete(productName);
-        return ApiResponse.<Boolean>builder().result(Boolean.TRUE).build();
-    }
-
-    @PostMapping("/category/create")
-    public ApiResponse<CategoryResponse> createCategory(@RequestBody @Valid CategoryRequest request) {
-        return ApiResponse.<CategoryResponse>builder()
-                .result(categoryService.create(request))
-                .build();
-    }
-
-    @GetMapping("/category/get")
-    public ApiResponse<List<CategoryResponse>> getAllCategory() {
-        return ApiResponse.<List<CategoryResponse>>builder()
-                .result(categoryService.getAll())
-                .build();
-    }
-
-    @DeleteMapping("/category/delete/{categoryName}")
-    public ApiResponse<Boolean> deleteCategory(@PathVariable @Valid String categoryName) {
-        categoryService.delete(categoryName);
         return ApiResponse.<Boolean>builder().result(Boolean.TRUE).build();
     }
 }

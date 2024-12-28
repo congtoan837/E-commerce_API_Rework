@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.CategoryRequest;
-import com.poly.dto.response.CategoryResponse;
+import com.poly.dto.response.product.CategoryResponse;
 import com.poly.entity.Category;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
@@ -34,7 +34,7 @@ public class CategoryService {
 
     public CategoryResponse update(CategoryRequest request) {
         Category category =
-                categoryRepository.findById(request.getName()).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+                categoryRepository.findById(request.getName()).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         categoryMapper.updateCategoryFromCategoryRequest(category, request);
 
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));

@@ -14,7 +14,7 @@ import com.poly.dto.request.LoginRequest;
 import com.poly.dto.request.UserRequest;
 import com.poly.dto.response.ApiResponse;
 import com.poly.dto.response.JwtResponse;
-import com.poly.dto.response.UserResponse;
+import com.poly.dto.response.user.UserResponse;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.services.AuthService;

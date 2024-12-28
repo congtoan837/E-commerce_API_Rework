@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 import com.poly.dto.request.PermissionRequest;
-import com.poly.dto.response.PermissionResponse;
+import com.poly.dto.response.user.PermissionResponse;
 import com.poly.entity.Permission;
 
 @Mapper(componentModel = "spring")

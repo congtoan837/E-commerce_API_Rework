@@ -28,13 +28,12 @@ public class CartItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "variant_id")
+    private Variant variant;
+
     @Column(nullable = false)
     private int quantity;
-
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false)
-    private Cart cart;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

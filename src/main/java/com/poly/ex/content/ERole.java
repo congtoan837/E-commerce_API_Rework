@@ -1,4 +1,4 @@
-package com.poly.ex;
+package com.poly.ex.content;
 
 public enum ERole {
     ADMIN,

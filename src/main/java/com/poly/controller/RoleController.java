@@ -6,12 +6,9 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.poly.dto.request.PermissionRequest;
 import com.poly.dto.request.RoleRequest;
 import com.poly.dto.response.ApiResponse;
-import com.poly.dto.response.PermissionResponse;
-import com.poly.dto.response.RoleResponse;
-import com.poly.services.PermissionService;
+import com.poly.dto.response.user.RoleResponse;
 import com.poly.services.RoleService;
 
 import lombok.AccessLevel;
@@ -24,7 +21,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleController {
     RoleService roleService;
-    PermissionService permissionService;
 
     @PostMapping("/create")
     public ApiResponse<?> createRole(@RequestBody @Valid RoleRequest request) {
@@ -43,26 +39,6 @@ public class RoleController {
     @DeleteMapping("/delete/{roleName}")
     public ApiResponse<Boolean> deleteRole(@PathVariable String roleName) {
         roleService.delete(roleName);
-        return ApiResponse.<Boolean>builder().result(Boolean.TRUE).build();
-    }
-
-    @PostMapping("/permission/create")
-    public ApiResponse<PermissionResponse> createPermission(@RequestBody @Valid PermissionRequest request) {
-        return ApiResponse.<PermissionResponse>builder()
-                .result(permissionService.create(request))
-                .build();
-    }
-
-    @GetMapping("/permission/get")
-    public ApiResponse<List<PermissionResponse>> getAllPermission() {
-        return ApiResponse.<List<PermissionResponse>>builder()
-                .result(permissionService.getAll())
-                .build();
-    }
-
-    @DeleteMapping("/permission/delete/{permissionName}")
-    public ApiResponse<Boolean> deletePermission(@PathVariable String permissionName) {
-        permissionService.delete(permissionName);
         return ApiResponse.<Boolean>builder().result(Boolean.TRUE).build();
     }
 }

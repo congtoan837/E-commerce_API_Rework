@@ -1,4 +1,4 @@
-package com.poly.dto.response;
+package com.poly.dto.response.user;
 
 import java.util.Set;
 

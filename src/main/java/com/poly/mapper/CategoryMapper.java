@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 import com.poly.dto.request.CategoryRequest;
-import com.poly.dto.response.CategoryResponse;
+import com.poly.dto.response.product.CategoryResponse;
 import com.poly.entity.Category;
 
 @Mapper(componentModel = "spring")

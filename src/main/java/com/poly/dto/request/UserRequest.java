@@ -3,6 +3,7 @@ package com.poly.dto.request;
 import java.util.Set;
 import java.util.UUID;
 
+import com.poly.validator.ValidPassword;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -35,7 +36,7 @@ public class UserRequest {
     @Pattern(regexp = "^[A-Za-z0-9]+$", message = "INPUT_VALID")
     private String username;
 
-    @Size(min = 6, message = "PASSWORD_SHORT")
+    @ValidPassword
     @Pattern(regexp = "^[A-Za-z0-9!@#$%^&*(),.?\":{}|<>]*$", message = "INPUT_VALID")
     private String password;
 

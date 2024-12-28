@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.poly.dto.request.UserRequest;
 import com.poly.dto.response.ApiResponse;
 import com.poly.dto.response.PageResponse;
-import com.poly.dto.response.UserResponse;
+import com.poly.dto.response.user.UserResponse;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.services.UserService;
@@ -61,6 +61,8 @@ public class UsersController {
 
     @DeleteMapping("/delete/{userId}")
     public ApiResponse<Boolean> deleteUser(@PathVariable UUID userId) {
-        return ApiResponse.<Boolean>builder().result(userService.delete(userId)).build();
+        return ApiResponse.<Boolean>builder()
+                .result(userService.delete(userId))
+                .build();
     }
 }

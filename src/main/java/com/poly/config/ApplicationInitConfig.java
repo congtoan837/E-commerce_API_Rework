@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.poly.entity.Role;
 import com.poly.entity.User;
-import com.poly.ex.ERole;
+import com.poly.ex.content.ERole;
 import com.poly.repositories.RoleRepository;
 import com.poly.repositories.UserRepository;
 
@@ -22,8 +22,8 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
-            //            Set<User> userSet = UserDataGenerator.createSampleUsers();
-            //            userRepository.saveAll(userSet);
+//                        Set<User> userSet = UserDataGenerator.createSampleUsers();
+//                        userRepository.saveAll(userSet);
 
             //            PaymentRequest request = new PaymentRequest();
             //            request.setAmount(10000);

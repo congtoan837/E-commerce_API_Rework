@@ -26,12 +26,16 @@ public class OrderItem {
     @JoinColumn(nullable = false)
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false)
+    private Variant variant;
+
     @Column(nullable = false)
     private int quantity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private Order order;
+    @Column(nullable = false)
+    private long amount;
+    @Column(nullable = false)
+    private long discount;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

@@ -10,5 +10,5 @@ import com.poly.entity.Voucher;
 
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher, UUID> {
-    Optional<Voucher> findByCode(String voucherCode);
+    Optional<Voucher> findByCodeAndIsDeletedFalse(String voucherCode);
 }

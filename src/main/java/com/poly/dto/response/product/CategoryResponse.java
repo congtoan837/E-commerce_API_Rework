@@ -1,9 +1,9 @@
-package com.poly.dto.response;
+package com.poly.dto.response.product;
 
 import lombok.Data;
 
 @Data
-public class PermissionResponse {
+public class CategoryResponse {
     private String name;
     private String description;
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.RoleRequest;
-import com.poly.dto.response.RoleResponse;
+import com.poly.dto.response.user.RoleResponse;
 import com.poly.entity.Permission;
 import com.poly.entity.Role;
 import com.poly.mapper.RoleMapper;

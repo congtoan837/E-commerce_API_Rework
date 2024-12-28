@@ -31,25 +31,16 @@ public class Order {
     private UUID id;
 
     @Column
-    private String orderName;
-
-    @Column
-    private String orderPhone;
-
-    @Column
-    private String orderAddress;
-
-    @Column
     private String voucherCode;
 
     @Column(nullable = false)
-    private Long originalAmount;
+    private long originalAmount;
 
     @Column(nullable = false)
-    private Long discountAmount;
+    private long discountAmount;
 
     @Column(nullable = false)
-    private Long totalAmount;
+    private long totalAmount;
 
     @Column(nullable = false)
     private String status;
@@ -58,9 +49,16 @@ public class Order {
     private String note;
 
     @Column
+    private String paymentMethod; // ATM, Cash
+
+    @Column(length = 1000)
+    private String paymentUrl;
+
+    @Column
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
     private Set<OrderItem> orderItems;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

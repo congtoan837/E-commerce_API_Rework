@@ -38,7 +38,7 @@ public class LoggingService {
                     .append("LOGGING REQUEST BODY-----------------------------------\n");
             log.info(data.toString());
         } catch (Exception e) {
-
+            log.error(e.getMessage());
         }
     }
 
@@ -62,7 +62,7 @@ public class LoggingService {
                     .append("LOGGING RESPONSE-----------------------------------\n");
             log.info(data.toString());
         } catch (Exception e) {
-
+            log.error(e.getMessage());
         }
     }
 }

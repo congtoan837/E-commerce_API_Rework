@@ -56,7 +56,7 @@ public class AuthService {
                 .subject(user.getUsername())
                 .issueTime(new Date())
                 .expirationTime(
-                        new Date(Instant.now().plus(15, ChronoUnit.MINUTES).toEpochMilli()))
+                        new Date(Instant.now().plus(15, ChronoUnit.HOURS).toEpochMilli()))
                 .claim("userId", user.getId())
                 .claim("scope", buildScope(user))
                 .build();

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.UserRequest;
 import com.poly.dto.response.PageResponse;
-import com.poly.dto.response.UserResponse;
+import com.poly.dto.response.user.UserResponse;
 import com.poly.entity.Role;
 import com.poly.entity.User;
 import com.poly.exception.AppException;
@@ -92,7 +92,7 @@ public class UserService {
 
     public boolean delete(UUID id) {
         User user =
-                userRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+                userRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setDeleted(true);
         userRepository.save(user);
 

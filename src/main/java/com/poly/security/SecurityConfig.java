@@ -19,8 +19,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.poly.ex.ERole;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -35,10 +33,6 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
                 .permitAll()
-                .requestMatchers(HttpMethod.GET, "/user/**")
-                .hasAuthority(ERole.USER.name())
-                .requestMatchers(HttpMethod.GET, "/admin/**")
-                .hasAuthority(ERole.ADMIN.name())
                 .anyRequest()
                 .authenticated());
 

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.PermissionRequest;
-import com.poly.dto.response.PermissionResponse;
+import com.poly.dto.response.user.PermissionResponse;
 import com.poly.entity.Permission;
 import com.poly.mapper.PermissionMapper;
 import com.poly.repositories.PermissionRepository;
