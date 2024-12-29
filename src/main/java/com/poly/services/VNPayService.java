@@ -1,17 +1,19 @@
 package com.poly.services;
 
-import com.poly.entity.Order;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.poly.entity.Order;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -48,7 +50,8 @@ public class VNPayService {
             try {
                 signData.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
                 signData.append("=");
-                signData.append(URLEncoder.encode(entry.getValue() == null ? "" : entry.getValue(), StandardCharsets.UTF_8));
+                signData.append(
+                        URLEncoder.encode(entry.getValue() == null ? "" : entry.getValue(), StandardCharsets.UTF_8));
             } catch (Exception e) {
                 log.error("Error encoding parameter: {}", entry.getKey());
                 e.printStackTrace();
@@ -150,4 +153,3 @@ public class VNPayService {
         }
     }
 }
-

@@ -2,17 +2,17 @@ package com.poly.services;
 
 import java.util.*;
 
-import com.poly.entity.*;
-import com.poly.repositories.VariantRepository;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.CartRequest;
 import com.poly.dto.response.cart.CartResponse;
+import com.poly.entity.*;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.mapper.CartMapper;
 import com.poly.repositories.CartRepository;
 import com.poly.repositories.ProductRepository;
+import com.poly.repositories.VariantRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,9 @@ public class CartService {
         // Tính toán tổng tiền giỏ hàng
         long totalPrice = cart.getCartItems().stream()
                 .mapToLong(item -> {
-                    long price = item.getVariant() != null ? item.getVariant().getPrice() : item.getProduct().getPrice();
+                    long price = item.getVariant() != null
+                            ? item.getVariant().getPrice()
+                            : item.getProduct().getPrice();
                     return price * item.getQuantity();
                 })
                 .sum();
@@ -62,9 +64,10 @@ public class CartService {
 
             // Kiểm tra sản phẩm và variant trong giỏ hàng
             Optional<CartItem> existingItemOptional = cart.getCartItems().stream()
-                    .filter(item -> item.getProduct().getId().equals(request.getProduct_id()) &&
-                            ((request.getVariant_id() == null && item.getVariant() == null) ||
-                                    (item.getVariant() != null && item.getVariant().getId().equals(request.getVariant_id()))))
+                    .filter(item -> item.getProduct().getId().equals(request.getProduct_id())
+                            && ((request.getVariant_id() == null && item.getVariant() == null)
+                                    || (item.getVariant() != null
+                                            && item.getVariant().getId().equals(request.getVariant_id()))))
                     .findFirst();
 
             if (existingItemOptional.isPresent()) {
@@ -168,10 +171,7 @@ public class CartService {
     }
 
     private Cart createEmptyCart(User user) {
-        return Cart.builder()
-                .user(user)
-                .cartItems(Collections.emptySet())
-                .build();
+        return Cart.builder().user(user).cartItems(Collections.emptySet()).build();
     }
 
     public CartResponse getCart() {
@@ -179,8 +179,7 @@ public class CartService {
         User user = userService.getCurrentUser();
 
         // Lấy giỏ hàng của user
-        Cart cart =
-                cartRepository.findByUserId(user.getId()).orElse(this.createEmptyCart(user));
+        Cart cart = cartRepository.findByUserId(user.getId()).orElse(this.createEmptyCart(user));
 
         this.calculatorTotalPrice(cart);
 
@@ -204,7 +203,8 @@ public class CartService {
 
         // Cập nhật variant nếu cần
         if (request.getVariant_id() != null) {
-            Variant variant = variantRepository.findById(request.getVariant_id())
+            Variant variant = variantRepository
+                    .findById(request.getVariant_id())
                     .orElseThrow(() -> new AppException(ErrorCode.VARIANT_INVALID));
             cartItem.setVariant(variant);
         }

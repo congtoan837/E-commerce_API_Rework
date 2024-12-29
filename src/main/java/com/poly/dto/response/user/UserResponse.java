@@ -3,9 +3,12 @@ package com.poly.dto.response.user;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class UserResponse {
     private UUID id;

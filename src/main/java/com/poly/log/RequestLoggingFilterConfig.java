@@ -21,7 +21,7 @@ public class RequestLoggingFilterConfig {
 
     @Bean
     public FilterRegistrationBean<CustomURLFilter> filterRegistrationBean() {
-        FilterRegistrationBean<CustomURLFilter> registrationBean = new FilterRegistrationBean();
+        FilterRegistrationBean<CustomURLFilter> registrationBean = new FilterRegistrationBean<>();
         CustomURLFilter customURLFilter = new CustomURLFilter();
 
         registrationBean.setFilter(customURLFilter);

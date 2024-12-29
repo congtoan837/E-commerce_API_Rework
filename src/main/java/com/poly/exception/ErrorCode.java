@@ -1,7 +1,6 @@
 package com.poly.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,10 +41,8 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(4005, "Order not found", HttpStatus.BAD_REQUEST),
     QUANTITY_INVALID(4006, "Quantity invalid", HttpStatus.BAD_REQUEST),
 
-    //
-    TRANSACTION_NOT_FOUND(5001, "Transaction not found", HttpStatus.BAD_REQUEST),
     ;
-    private final int code;            // Mã lỗi
-    private final String message;      // Thông báo lỗi
+    private final int code; // Mã lỗi
+    private final String message; // Thông báo lỗi
     private final HttpStatus statusCode; // HTTP Status cho phản hồi
 }

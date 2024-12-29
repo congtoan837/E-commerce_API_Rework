@@ -1,9 +1,10 @@
 package com.poly.services;
 
+import org.springframework.stereotype.Service;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class ScheduledService {
     OrderService orderService;
 
-//    @Scheduled(fixedRate = 3600000) // Chạy mỗi giờ
+    //    @Scheduled(fixedRate = 3600000) // Chạy mỗi giờ
     public void cancelUnpaidOrdersTask() {
         orderService.cancelUnpaidOrders();
     }

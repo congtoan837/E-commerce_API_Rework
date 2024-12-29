@@ -1,8 +1,10 @@
 package com.poly.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ImageResponse {
     public String name;
     public String url;

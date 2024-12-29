@@ -1,20 +1,24 @@
 package com.poly.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import jakarta.persistence.*;
-import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
-@Data
-@AllArgsConstructor
+import lombok.*;
+
+@Getter
+@Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "variants")
 public class Variant {
     @Id
@@ -37,14 +41,13 @@ public class Variant {
 
     @Column(nullable = false)
     private long stockQuantity;
+
     @Column(nullable = false)
     private long soldQuantity;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "product_id", nullable = false)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private Product product;
 
     @Column

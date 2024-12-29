@@ -1,22 +1,22 @@
 package com.poly.entity;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "transactions")
 public class Transaction {
     @Id
@@ -24,14 +24,19 @@ public class Transaction {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(updatable = false, nullable = false)
     private UUID id;
+
     @Column
     private String transactionId; // Mã giao dịch của cổng thanh toán
+
     @Column
     private String paymentMethod; // e.g., "VNPAY", "MOMO", "PAYPAL"
+
     @Column
     private long amount;
+
     @Column
     private String responseCode;
+
     @Column
     private String status;
 

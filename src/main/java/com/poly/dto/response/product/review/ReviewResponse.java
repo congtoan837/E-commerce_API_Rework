@@ -2,11 +2,12 @@ package com.poly.dto.response.product.review;
 
 import java.util.UUID;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class
-ReviewResponse {
+@Getter
+@Setter
+public class ReviewResponse {
     private UUID id;
     private int rating;
     private String title;

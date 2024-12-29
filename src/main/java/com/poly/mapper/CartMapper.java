@@ -8,5 +8,4 @@ import com.poly.entity.Cart;
 @Mapper(componentModel = "spring")
 public interface CartMapper {
     CartResponse toCartResponse(Cart cart);
-
 }

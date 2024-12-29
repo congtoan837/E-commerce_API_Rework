@@ -14,11 +14,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "carts")
 public class Cart {
     @Id

@@ -10,11 +10,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "order_items")
 public class OrderItem {
     @Id
@@ -32,8 +33,10 @@ public class OrderItem {
 
     @Column(nullable = false)
     private int quantity;
+
     @Column(nullable = false)
     private long amount;
+
     @Column(nullable = false)
     private long discount;
 

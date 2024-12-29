@@ -1,5 +1,12 @@
 package com.poly.services;
 
+import java.util.List;
+import java.util.Objects;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
 import com.poly.dto.request.ReviewRequest;
 import com.poly.dto.response.product.review.ReviewResponse;
 import com.poly.entity.Product;
@@ -10,14 +17,10 @@ import com.poly.exception.ErrorCode;
 import com.poly.mapper.ReviewMapper;
 import com.poly.repositories.ProductRepository;
 import com.poly.repositories.ReviewRepository;
-import jakarta.transaction.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,8 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse create(ReviewRequest request) {
-        Product product = productRepository.findByIdAndIsDeletedFalse(request.getProductId())
+        Product product = productRepository
+                .findByIdAndIsDeletedFalse(request.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         User user = userService.getCurrentUser();
@@ -53,12 +57,14 @@ public class ReviewService {
 
     @Transactional
     public void delete(ReviewRequest request) {
-        Product product = productRepository.findByIdAndIsDeletedFalse(request.getProductId())
+        Product product = productRepository
+                .findByIdAndIsDeletedFalse(request.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         User user = userService.getCurrentUser();
 
-        Review review = reviewRepository.findByIdAndIsDeletedFalse()
+        Review review = reviewRepository
+                .findByIdAndIsDeletedFalse(request.getId())
                 .filter(r -> Objects.equals(r.getUser().getId(), user.getId()))
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 

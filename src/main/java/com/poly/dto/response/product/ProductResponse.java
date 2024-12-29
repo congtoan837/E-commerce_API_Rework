@@ -4,9 +4,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.poly.dto.response.product.review.ReviewResponse;
-import lombok.Data;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ProductResponse {
     private UUID id;
     private String name;

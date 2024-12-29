@@ -4,24 +4,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import com.poly.ex.content.OrderStatus;
-import com.poly.repositories.*;
-import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.OrderRequest;
-import com.poly.dto.response.order.OrderResponse;
 import com.poly.dto.response.PageResponse;
+import com.poly.dto.response.order.OrderResponse;
 import com.poly.entity.*;
+import com.poly.ex.content.OrderStatus;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.mapper.OrderMapper;
+import com.poly.repositories.*;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -46,13 +47,15 @@ public class OrderService {
         User user = userService.getCurrentUser();
 
         // Lấy giỏ hàng của người dùng
-        Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
+        Cart cart =
+                cartRepository.findByUserId(user.getId()).orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
 
         Voucher voucher = applyVoucher(request.getVoucherCode());
 
         List<CartItem> cartItemList = new ArrayList<>(cart.getCartItems());
-        cartItemList.sort(Comparator.comparing(item -> item.getVariant() != null ? item.getVariant().getPrice() : item.getProduct().getPrice()));
+        cartItemList.sort(Comparator.comparing(item -> item.getVariant() != null
+                ? item.getVariant().getPrice()
+                : item.getProduct().getPrice()));
 
         Set<OrderItem> orderItems = new HashSet<>();
         long totalAmount = 0;
@@ -66,7 +69,8 @@ public class OrderService {
             long itemPrice;
 
             if (variantItem != null) { // Xử lý trường hợp có Variant
-                Variant variant = variantRepository.findById(variantItem.getId())
+                Variant variant = variantRepository
+                        .findById(variantItem.getId())
                         .orElseThrow(() -> new AppException(ErrorCode.VARIANT_INVALID));
                 if (variant.getStockQuantity() < quantity) {
                     throw new AppException(ErrorCode.OUT_OF_STOCK);
@@ -79,7 +83,8 @@ public class OrderService {
 
                 itemPrice = variant.getPrice();
             } else { // Xử lý trường hợp không có Variant
-                Product product = productRepository.findById(productItem.getId())
+                Product product = productRepository
+                        .findById(productItem.getId())
                         .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
                 if (product.getStockQuantity() < quantity) {
                     throw new AppException(ErrorCode.OUT_OF_STOCK);
@@ -109,14 +114,14 @@ public class OrderService {
             totalDiscount = calculateTotalDiscount(voucher, cartItemList);
         }
 
-        //Phân bổ discount cho từng orderItem
+        // Phân bổ discount cho từng orderItem
         long distributedDiscount = 0;
         for (OrderItem orderItem : orderItems) {
             long itemDiscount = Math.round((double) orderItem.getAmount() / totalAmount * totalDiscount);
             orderItem.setDiscount(itemDiscount);
             distributedDiscount += itemDiscount;
         }
-        //Kiểm tra lại để đảm bảo tổng discount không bị lệch do làm tròn
+        // Kiểm tra lại để đảm bảo tổng discount không bị lệch do làm tròn
         long diff = totalDiscount - distributedDiscount;
         if (diff != 0) {
             for (OrderItem orderItem : orderItems) {
@@ -162,28 +167,36 @@ public class OrderService {
             return null;
         }
 
-        return voucherRepository.findByCodeAndIsDeletedFalse(voucherCode)
+        return voucherRepository
+                .findByCodeAndIsDeletedFalse(voucherCode)
                 .filter(this::isVoucherValid)
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_INVALID));
     }
 
     // Kiểm tra voucher có hợp lệ không
     private boolean isVoucherValid(Voucher voucher) {
-        return "active".equals(voucher.getStatus()) &&
-                voucher.getConsumedQuantity() < voucher.getLimitQuantity() &&
-                voucher.getStartDate().isAfter(LocalDate.now()) &&
-                voucher.getEndDate().isBefore(LocalDate.now());
+        return "active".equals(voucher.getStatus())
+                && voucher.getConsumedQuantity() < voucher.getLimitQuantity()
+                && voucher.getStartDate().isAfter(LocalDate.now())
+                && voucher.getEndDate().isBefore(LocalDate.now());
     }
 
     // Tính toán giá trị giảm giá
     private long calculateTotalDiscount(Voucher voucher, List<CartItem> cartItems) {
         long totalDiscount = 0;
-        long totalCartValue = cartItems.stream().mapToLong(item -> (item.getVariant() != null ? item.getVariant().getPrice() : item.getProduct().getPrice()) * item.getQuantity()).sum();
+        long totalCartValue = cartItems.stream()
+                .mapToLong(item -> (item.getVariant() != null
+                                ? item.getVariant().getPrice()
+                                : item.getProduct().getPrice())
+                        * item.getQuantity())
+                .sum();
         long maxDiscountAmount = voucher.getValue();
 
         for (CartItem item : cartItems) {
             Product product = item.getProduct();
-            long price = item.getVariant() != null ? item.getVariant().getPrice() : item.getProduct().getPrice();
+            long price = item.getVariant() != null
+                    ? item.getVariant().getPrice()
+                    : item.getProduct().getPrice();
             if (isVoucherApplicableToProduct(voucher, product)) {
                 long itemValue = price * item.getQuantity();
                 long itemDiscount;
@@ -199,7 +212,6 @@ public class OrderService {
                 totalDiscount += itemDiscount;
             }
             if (totalDiscount >= maxDiscountAmount) break;
-
         }
         return totalDiscount;
     }
@@ -251,7 +263,8 @@ public class OrderService {
     }
 
     public OrderResponse cancelOrder(OrderRequest request) {
-        Order order = orderRepository.findById(request.getId())
+        Order order = orderRepository
+                .findById(request.getId())
                 .filter(o -> OrderStatus.PENDING.getName().equals(o.getStatus()))
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
@@ -264,7 +277,8 @@ public class OrderService {
     public void cancelUnpaidOrders() {
         List<Order> unpaidOrders = orderRepository.findByStatus(OrderStatus.PENDING.getName());
         unpaidOrders.stream()
-                .filter(order -> order.getCreateTime().isBefore(LocalDateTime.now().minusHours(1)))
+                .filter(order ->
+                        order.getCreateTime().isBefore(LocalDateTime.now().minusHours(1)))
                 .forEach(order -> {
                     order.setStatus(OrderStatus.CANCELLED.getName());
                     orderRepository.save(order);

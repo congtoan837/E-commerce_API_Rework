@@ -1,12 +1,10 @@
 package com.poly.log;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.UUID;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -18,11 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CustomURLFilter implements Filter {
 
     private static final String REQUEST_ID = "request_id";
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // Có thể thêm logic khởi tạo nếu cần thiết
-    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
@@ -43,39 +36,33 @@ public class CustomURLFilter implements Filter {
         }
     }
 
-    @Override
-    public void destroy() {
-        // Có thể thêm logic dọn dẹp tài nguyên nếu cần
-    }
-
     private void logRequest(HttpServletRequest request, String requestId) {
         if (request != null) {
             StringBuilder data = new StringBuilder();
-            data.append("\nLOGGING REQUEST-----------------------------------\n")
-                    .append("[REQUEST-ID]: ")
-                    .append(requestId)
+            data.append("\n")
+                    .append("LOGGING REQUEST----------------------------------------")
                     .append("\n")
-                    .append("[USERNAME]: ")
-                    .append(request.getRemoteUser() != null ? request.getRemoteUser() : "Anonymous")
+                    .append("[REQUEST-ID]: ").append(requestId)
                     .append("\n")
-                    .append("[PATH]: ")
-                    .append(request.getRequestURI())
+                    .append("[USERNAME]: ").append(request.getRemoteUser() != null ? request.getRemoteUser() : "Anonymous")
                     .append("\n")
-                    .append("[QUERIES]: ")
-                    .append(request.getQueryString() != null ? request.getQueryString() : "No query")
+                    .append("[PATH]: ").append(request.getRequestURI())
                     .append("\n")
-                    .append("[HEADERS]: ")
+                    .append("[QUERIES]: ").append(request.getQueryString() != null ? request.getQueryString() : "No query")
                     .append("\n");
 
-            // Duyệt qua tất cả các header của request
-            Enumeration<String> headerNames = request.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                String key = headerNames.nextElement();
-                String value = request.getHeader(key);
-                data.append("---").append(key).append(" : ").append(value).append("\n");
-            }
+//                    .append("[HEADERS]: ")
+//                    .append("\n");
+//
+//            // Duyệt qua tất cả các header của request
+//            Enumeration<String> headerNames = request.getHeaderNames();
+//            while (headerNames.hasMoreElements()) {
+//                String key = headerNames.nextElement();
+//                String value = request.getHeader(key);
+//                data.append("---").append(key).append(" : ").append(value).append("\n");
+//            }
 
-            data.append("LOGGING REQUEST-----------------------------------\n");
+            data.append("LOGGING REQUEST----------------------------------------\n");
             log.info(data.toString());
         }
     }

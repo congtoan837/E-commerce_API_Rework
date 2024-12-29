@@ -29,9 +29,7 @@ public class CartController {
 
     @GetMapping("/get")
     public ApiResponse<CartResponse> getCart() {
-        return ApiResponse.<CartResponse>builder()
-                .result(cartService.getCart())
-                .build();
+        return ApiResponse.<CartResponse>builder().result(cartService.getCart()).build();
     }
 
     @GetMapping("/update")

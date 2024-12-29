@@ -1,10 +1,12 @@
 package com.poly.dto.response.product;
 
-import lombok.Data;
-
 import java.util.UUID;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class VariantResponse {
     private UUID id;
     private String color;

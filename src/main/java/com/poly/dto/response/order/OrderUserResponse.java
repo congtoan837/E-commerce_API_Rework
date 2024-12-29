@@ -1,10 +1,12 @@
 package com.poly.dto.response.order;
 
-import lombok.Data;
-
 import java.util.UUID;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class OrderUserResponse {
     private UUID id;
     private String username;

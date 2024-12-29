@@ -3,10 +3,11 @@ package com.poly.dto.request;
 import java.util.Set;
 import java.util.UUID;
 
-import com.poly.validator.ValidPassword;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import com.poly.validator.ValidPassword;
 
 import lombok.Builder;
 import lombok.Getter;

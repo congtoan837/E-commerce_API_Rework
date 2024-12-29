@@ -13,11 +13,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "vouchers")
 public class Voucher {
     @Id

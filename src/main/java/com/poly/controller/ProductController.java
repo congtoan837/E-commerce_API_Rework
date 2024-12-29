@@ -4,8 +4,6 @@ import java.util.UUID;
 
 import jakarta.validation.Valid;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import com.poly.dto.request.ProductRequest;
@@ -14,7 +12,9 @@ import com.poly.dto.response.PageResponse;
 import com.poly.dto.response.product.ProductResponse;
 import com.poly.services.ProductService;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequestMapping("/product")

@@ -22,15 +22,8 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
-//                        Set<User> userSet = UserDataGenerator.createSampleUsers();
-//                        userRepository.saveAll(userSet);
-
-            //            PaymentRequest request = new PaymentRequest();
-            //            request.setAmount(10000);
-            //            request.setOrderId(UUID.randomUUID());
-            //
-            //            ConfigPayment configPayment = new ConfigPayment();
-            //            configPayment.createVnPayPayment(request);
+            //                        Set<User> userSet = UserDataGenerator.createSampleUsers();
+            //                        userRepository.saveAll(userSet);
 
             if (userRepository.existsByUsernameAndIsDeletedFalse("admin")) return;
             for (ERole eRole : ERole.values()) {

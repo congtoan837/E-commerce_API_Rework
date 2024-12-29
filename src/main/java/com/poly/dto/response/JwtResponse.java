@@ -2,9 +2,12 @@ package com.poly.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public class JwtResponse {

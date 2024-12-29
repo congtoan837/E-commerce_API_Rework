@@ -2,9 +2,11 @@ package com.poly.dto.response.order;
 
 import java.util.Set;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class OrderResponse {
     private Set<OrderItemResponse> orderItems;
     private OrderUserResponse user;

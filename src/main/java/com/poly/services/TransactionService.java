@@ -1,5 +1,13 @@
 package com.poly.services;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
 import com.poly.entity.Order;
 import com.poly.entity.Transaction;
 import com.poly.ex.content.TransactionStatus;
@@ -7,16 +15,11 @@ import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.repositories.OrderRepository;
 import com.poly.repositories.TransationRepository;
-import jakarta.transaction.Transactional;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +52,8 @@ public class TransactionService {
 
         // Lấy thông tin thanh toán từ database
         UUID orderId = UUID.fromString(responseParams.get("vnp_TxnRef")); // Lấy orderId từ responseParams
-        Transaction transaction = transationRepository.findByOrderId(orderId)
+        Transaction transaction = transationRepository
+                .findByOrderId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         // Cập nhật thông tin giao dịch

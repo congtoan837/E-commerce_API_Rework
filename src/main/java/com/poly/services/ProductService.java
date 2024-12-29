@@ -2,10 +2,8 @@ package com.poly.services;
 
 import java.util.*;
 
-import com.poly.dto.request.VariantRequest;
-import com.poly.entity.Variant;
-import com.poly.mapper.VariantMapper;
 import jakarta.transaction.Transactional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,13 +11,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.poly.dto.request.ProductRequest;
+import com.poly.dto.request.VariantRequest;
 import com.poly.dto.response.PageResponse;
 import com.poly.dto.response.product.ProductResponse;
 import com.poly.entity.Category;
 import com.poly.entity.Product;
+import com.poly.entity.Variant;
 import com.poly.exception.AppException;
 import com.poly.exception.ErrorCode;
 import com.poly.mapper.ProductMapper;
+import com.poly.mapper.VariantMapper;
 import com.poly.repositories.CategoryRepository;
 import com.poly.repositories.ProductRepository;
 
@@ -90,13 +91,14 @@ public class ProductService {
         Sort sort = Sort.by(Sort.Direction.ASC, "createTime");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        var pageResult = productRepository.searchByKeyword(keyword, pageable);
+        var pageResult = productRepository.findByNameContainingIgnoreCaseAndIsDeletedFalse(keyword, pageable);
         return productMapper.toPageResponse(pageResult);
     }
 
     @Transactional
     public ProductResponse update(ProductRequest request) {
-        Product currentProduct = productRepository.findById(request.getId())
+        Product currentProduct = productRepository
+                .findById(request.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         // Vô hiệu hóa phiên bản cũ

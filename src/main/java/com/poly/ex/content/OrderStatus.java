@@ -7,8 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OrderStatus {
     PENDING("pending"),
-    CANCELLED("cancelled")
-    ;
+    CANCELLED("cancelled");
 
-    private String name;
+    private final String name;
 }

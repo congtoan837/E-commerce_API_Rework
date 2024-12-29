@@ -16,11 +16,13 @@ import com.poly.entity.Product;
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     @Query("SELECT p FROM Product p WHERE p.isDeleted = false "
             + "AND ("
-            + "p.name ILIKE %:keyword% OR remove_accent(p.name) ILIKE %:keyword% OR "
-            + "p.description ILIKE %:keyword% OR remove_accent(p.description) ILIKE %:keyword%)")
+            + "p.name ILIKE %:keyword% OR unaccent(p.name) ILIKE %:keyword% OR "
+            + "p.description ILIKE %:keyword% OR unaccent(p.description) ILIKE %:keyword%)")
     Page<Product> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     Page<Product> findByIsDeletedFalse(Pageable pageable);
 
     Optional<Product> findByIdAndIsDeletedFalse(UUID Id);
+
+    Page<Product> findByNameContainingIgnoreCaseAndIsDeletedFalse(String name, Pageable pageable);
 }

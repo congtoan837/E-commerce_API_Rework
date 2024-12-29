@@ -91,8 +91,9 @@ public class UserService {
     }
 
     public boolean delete(UUID id) {
-        User user =
-                userRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository
+                .findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setDeleted(true);
         userRepository.save(user);
 

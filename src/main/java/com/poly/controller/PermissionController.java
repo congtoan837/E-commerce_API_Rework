@@ -1,16 +1,19 @@
 package com.poly.controller;
 
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.*;
+
 import com.poly.dto.request.PermissionRequest;
 import com.poly.dto.response.ApiResponse;
 import com.poly.dto.response.user.PermissionResponse;
 import com.poly.services.PermissionService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/permission")

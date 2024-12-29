@@ -1,14 +1,13 @@
 package com.poly.dto.request;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ProductRequest {
     private UUID id;
 
